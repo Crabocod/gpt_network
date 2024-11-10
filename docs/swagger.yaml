@@ -1,0 +1,205 @@
+openapi: "3.0.0"
+info:
+  title: "RESTful API"
+  description: "Документация для API сервиса Friends GPT's"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:85"
+paths:
+  /register:
+    post:
+      summary: "Регистрация пользователя"
+      description: "Создаёт нового пользователя, используя имя пользователя и пароль."
+      tags:
+        - "auth"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                password:
+                  type: string
+                  example: "strongpassword"
+      responses:
+        "201":
+          description: "Пользователь успешно зарегистрирован"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User registered successfully"
+        "500":
+          description: "Ошибка сервера при регистрации пользователя"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to register user"
+
+  /login:
+    post:
+      summary: "Авторизация пользователя"
+      description: "Аутентифицирует пользователя и возвращает токены доступа и обновления."
+      tags:
+        - "auth"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                password:
+                  type: string
+                  example: "strongpassword"
+      responses:
+        "200":
+          description: "Успешная авторизация"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJhbGciOi..."
+                  refresh_token:
+                    type: string
+                    example: "dGhpcyBpcyBhIHJlZnJlc2g..."
+        "401":
+          description: "Неверные учетные данные"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid client credentials"
+
+  /logout:
+    post:
+      summary: "Выход пользователя"
+      description: "Выходит из системы, удаляя refresh_token пользователя."
+      tags:
+        - "auth"
+      responses:
+        "200":
+          description: "Успешный выход"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User logged out successfully"
+        "500":
+          description: "Ошибка сервера при попытке выхода"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to log out user"
+
+  /:
+    get:
+      summary: "Получение информации о пользователе"
+      description: "Возвращает информацию о текущем пользователе, основываясь на его ID."
+      tags:
+        - "user"
+      responses:
+        "200":
+          description: "Информация о пользователе"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "testuser"
+                  email:
+                    type: string
+                    example: "testuser@example.com"
+        "500":
+          description: "Пользователь не найден"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+
+  /refresh_token:
+    post:
+      summary: "Обновление токена"
+      description: "Принимает refresh_token и возвращает новый access_token и refresh_token."
+      tags:
+        - "auth"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  example: "dGhpcyBpcyBhIHJlZnJlc2g..."
+      responses:
+        "200":
+          description: "Обновленные токены"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsIn..."
+                  refresh_token:
+                    type: string
+                    example: "dGhpcyBpcyBhIG5ldyByZWZy..."
+        "401":
+          description: "Недействительный или истекший refresh_token"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid or expired refresh token"
+        "500":
+          description: "Ошибка сервера при генерации токенов"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to generate access token"
