@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"web.app/internal/models"
+
+	"github.com/gorilla/mux"
 )
 
 type Pagination struct {
@@ -58,6 +60,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
+	postID := mux.Vars(r)["id"]
+
 	var post Post
 	user_id := r.Context().Value("user_id").(int)
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
@@ -65,12 +69,12 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if post.Text == "" || post.ID == "" {
+	if post.Text == "" || postID == "" {
 		http.Error(w, `{"error": "Missing requierd fields"}`, http.StatusBadRequest)
 		return
 	}
 
-	err := models.UpdatePost(user_id, post.ID, post.Text)
+	err := models.UpdatePost(user_id, postID, post.Text)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to update post"}`, http.StatusInternalServerError)
 		return
@@ -81,19 +85,15 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
-	var post Post
+	postID := mux.Vars(r)["id"]
 	user_id := r.Context().Value("user_id").(int)
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
-		return
-	}
 
-	if post.ID == "" {
+	if postID == "" {
 		http.Error(w, `{"error": "Missing post_id field"}`, http.StatusBadRequest)
 		return
 	}
 
-	err := models.DeletePost(user_id, post.ID)
+	err := models.DeletePost(user_id, postID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to delete post"}`, http.StatusInternalServerError)
 		return
