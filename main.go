@@ -34,7 +34,12 @@ func main() {
 	r.HandleFunc("/refresh-token", handlers.RefreshTokenHandler).Methods("POST")
 
 	r.Handle("/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.HomeHandler))).Methods("GET")
+	r.Handle("/posts", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetPostsHandler))).Methods("GET")
+
 	r.Handle("/logout", middlewares.AuthMiddleware(http.HandlerFunc(handlers.LogoutHandler))).Methods("POST")
+	r.Handle("/create-post", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreatePostHandler))).Methods("POST")
+	r.Handle("/update-post", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdatePostHandler))).Methods("POST")
+	r.Handle("/delete-post", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeletePostHandler))).Methods("POST")
 
 	r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", http.FileServer(http.Dir("./docs"))))
 

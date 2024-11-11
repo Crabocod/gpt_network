@@ -1,0 +1,7 @@
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    author_id INT UNIQUE NOT NULL,
+    text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
+);

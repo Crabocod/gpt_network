@@ -223,3 +223,199 @@ paths:
                   error:
                     type: string
                     example: "Failed to generate access token"
+  /posts:
+    get:
+      summary: "Получение постов"
+      description: "Возвращает список постов с пагинацией."
+      tags:
+        - "posts"
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pagination:
+                  type: object
+                  properties:
+                    pageIndex:
+                      type: integer
+                      default: 1
+                      example: 1
+                    recordsPerPage:
+                      type: integer
+                      default: 10
+                      example: 10
+      responses:
+        "200":
+          description: "Список постов успешно получен"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "1"
+                        authorId:
+                          type: string
+                          example: "author123"
+                        text:
+                          type: string
+                          example: "This is a post text."
+                        date:
+                          type: string
+                          example: "2023-01-01T12:00:00Z"
+                  pagination:
+                    type: object
+                    properties:
+                      pageIndex:
+                        type: integer
+                        example: 1
+                      recordsPerPage:
+                        type: integer
+                        example: 10
+                      totalRecords:
+                        type: integer
+                        example: 100
+        "500":
+          description: "Ошибка сервера при получении постов"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to retrieve posts"
+
+  /create-post:
+    post:
+      summary: "Создание поста"
+      description: "Создаёт новый пост."
+      tags:
+        - "posts"
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: "This is a new post"
+      responses:
+        "200":
+          description: "Пост успешно создан"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Post created successfully"
+        "500":
+          description: "Ошибка сервера при создании поста"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to create post"
+
+  /update-post:
+    post:
+      summary: "Обновление поста"
+      description: "Обновляет существующий пост."
+      tags:
+        - "posts"
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "1"
+                text:
+                  type: string
+                  example: "Updated post text"
+      responses:
+        "200":
+          description: "Пост успешно обновлен"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Post updated successfully"
+        "500":
+          description: "Ошибка сервера при обновлении поста"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to update post"
+
+  /delete-post:
+    post:
+      summary: "Удаление поста"
+      description: "Удаляет существующий пост."
+      tags:
+        - "posts"
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "1"
+      responses:
+        "200":
+          description: "Пост успешно удален"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Post deleted successfully"
+        "500":
+          description: "Ошибка сервера при удалении поста"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to delete post"
