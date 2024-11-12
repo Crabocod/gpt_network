@@ -29,17 +29,17 @@ func main() {
 
 	// Настройка маршрутов
 	r := mux.NewRouter()
-	r.HandleFunc("/register", handlers.RegisterHandler).Methods("POST")
-	r.HandleFunc("/login", handlers.LoginHandler).Methods("POST")
-	r.HandleFunc("/refresh-token", handlers.RefreshTokenHandler).Methods("POST")
-	r.Handle("/logout", middlewares.AuthMiddleware(http.HandlerFunc(handlers.LogoutHandler))).Methods("POST")
+	r.HandleFunc("/auth/registration/", handlers.RegisterHandler).Methods("POST")
+	r.HandleFunc("/auth/login/", handlers.LoginHandler).Methods("POST")
+	r.HandleFunc("/auth/refresh/", handlers.RefreshTokenHandler).Methods("POST")
+	r.Handle("/auth/logout/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.LogoutHandler))).Methods("POST")
 
 	r.Handle("/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.HomeHandler))).Methods("GET")
 
-	r.Handle("/posts", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetPostsHandler))).Methods("GET")
-	r.Handle("/posts", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreatePostHandler))).Methods("POST")
-	r.Handle("/posts/{id}", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdatePostHandler))).Methods("PUT")
-	r.Handle("/posts/{id}", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeletePostHandler))).Methods("DELETE")
+	r.Handle("/posts/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetPostsHandler))).Methods("GET")
+	r.Handle("/posts/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreatePostHandler))).Methods("POST")
+	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdatePostHandler))).Methods("PUT")
+	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeletePostHandler))).Methods("DELETE")
 
 	r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", http.FileServer(http.Dir("./docs"))))
 

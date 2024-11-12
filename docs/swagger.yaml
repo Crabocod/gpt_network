@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   title: "RESTful API"
-  description: "Документация для API сервиса Friends GPT's"
+  description: "Документация для API"
   version: "1.0.0"
 servers:
   - url: "http://localhost:85"
@@ -22,10 +22,9 @@ components:
 security:
   - BearerAuth: []
 paths:
-  /register:
+  /auth/registration/:
     post:
       summary: "Регистрация пользователя"
-      description: "Создаёт нового пользователя, используя имя пользователя и пароль."
       tags:
         - "auth"
       requestBody:
@@ -44,29 +43,12 @@ paths:
       responses:
         "201":
           description: "Пользователь успешно зарегистрирован"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "User registered successfully"
         "500":
           description: "Ошибка сервера при регистрации пользователя"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to register user"
 
-  /login:
+  /auth/login/:
     post:
-      summary: "Авторизация пользователя"
-      description: "Аутентифицирует пользователя и возвращает токены доступа и обновления."
+      summary: "Аутентификация пользователя"
       tags:
         - "auth"
       requestBody:
@@ -84,99 +66,13 @@ paths:
                   example: "strongpassword"
       responses:
         "200":
-          description: "Успешная авторизация"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-                    example: "eyJhbGciOi..."
-                  refresh_token:
-                    type: string
-                    example: "dGhpcyBpcyBhIHJlZnJlc2g..."
+          description: "Успешный вход"
         "401":
           description: "Неверные учетные данные"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid client credentials"
 
-  /logout:
-    post:
-      summary: "Выход пользователя"
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-      description: "Выходит из системы, удаляя refresh_token пользователя."
-      tags:
-        - "auth"
-      responses:
-        "200":
-          description: "Успешный выход"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "User logged out successfully"
-        "500":
-          description: "Ошибка сервера при попытке выхода"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to log out user"
-
-  /:
-    get:
-      summary: "Получение информации о пользователе"
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-      description: "Возвращает информацию о текущем пользователе, основываясь на его ID."
-      tags:
-        - "user"
-      responses:
-        "200":
-          description: "Информация о пользователе"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  username:
-                    type: string
-                    example: "testuser"
-                  email:
-                    type: string
-                    example: "testuser@example.com"
-        "500":
-          description: "Пользователь не найден"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "User not found"
-
-  /refresh_token:
+  /auth/refresh/:
     post:
       summary: "Обновление токена"
-      description: "Принимает refresh_token и возвращает новый access_token и refresh_token."
       tags:
         - "auth"
       requestBody:
@@ -188,49 +84,46 @@ paths:
               properties:
                 refresh_token:
                   type: string
-                  example: "dGhpcyBpcyBhIHJlZnJlc2g..."
+                  example: "refresh_token_value"
       responses:
         "200":
-          description: "Обновленные токены"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsIn..."
-                  refresh_token:
-                    type: string
-                    example: "dGhpcyBpcyBhIG5ldyByZWZy..."
+          description: "Новый токен выдан"
         "401":
-          description: "Недействительный или истекший refresh_token"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid or expired refresh token"
-        "500":
-          description: "Ошибка сервера при генерации токенов"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to generate access token"
-  /posts:
-    get:
-      summary: "Получение постов"
-      description: "Возвращает список постов с пагинацией."
-      tags:
-        - "posts"
+          description: "Неверный или истекший refresh_token"
+
+  /auth/logout/:
+    post:
+      summary: "Выход из системы"
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
+      tags:
+        - "auth"
+      responses:
+        "200":
+          description: "Успешный выход"
+        "500":
+          description: "Ошибка сервера при выходе"
+
+  /:
+    get:
+      summary: "Информация о пользователе"
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      tags:
+        - "user"
+      responses:
+        "200":
+          description: "Информация о пользователе"
+        "500":
+          description: "Пользователь не найден"
+
+  /posts/:
+    get:
+      summary: "Получение списка постов"
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      tags:
+        - "posts"
       requestBody:
         required: true
         content:
@@ -243,68 +136,20 @@ paths:
                   properties:
                     pageIndex:
                       type: integer
-                      default: 1
                       example: 1
                     recordsPerPage:
                       type: integer
-                      default: 10
                       example: 10
       responses:
         "200":
-          description: "Список постов успешно получен"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  posts:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          example: "1"
-                        authorId:
-                          type: string
-                          example: "author123"
-                        text:
-                          type: string
-                          example: "This is a post text."
-                        date:
-                          type: string
-                          example: "2023-01-01T12:00:00Z"
-                  pagination:
-                    type: object
-                    properties:
-                      pageIndex:
-                        type: integer
-                        example: 1
-                      recordsPerPage:
-                        type: integer
-                        example: 10
-                      totalRecords:
-                        type: integer
-                        example: 100
-        "500":
-          description: "Ошибка сервера при получении постов"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to retrieve posts"
+          description: "Список постов"
 
-  /create-post:
     post:
-      summary: "Создание поста"
-      description: "Создаёт новый пост."
-      tags:
-        - "posts"
+      summary: "Создание нового поста"
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
+      tags:
+        - "posts"
       requestBody:
         required: true
         content:
@@ -314,37 +159,26 @@ paths:
               properties:
                 text:
                   type: string
-                  example: "This is a new post"
+                  example: "This is a new post."
       responses:
         "200":
           description: "Пост успешно создан"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Post created successfully"
         "500":
-          description: "Ошибка сервера при создании поста"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to create post"
+          description: "Ошибка при создании поста"
 
-  /update-post:
-    post:
+  /posts/{id}/:
+    put:
       summary: "Обновление поста"
-      description: "Обновляет существующий пост."
-      tags:
-        - "posts"
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "ID поста для обновления"
+      tags:
+        - "posts"
       requestBody:
         required: true
         content:
@@ -352,70 +186,33 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
-                  example: "1"
                 text:
                   type: string
-                  example: "Updated post text"
+                  example: "Updated post content"
       responses:
         "200":
           description: "Пост успешно обновлен"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Post updated successfully"
+        "400":
+          description: "Неверный запрос"
         "500":
           description: "Ошибка сервера при обновлении поста"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to update post"
 
-  /delete-post:
-    post:
+    delete:
       summary: "Удаление поста"
-      description: "Удаляет существующий пост."
-      tags:
-        - "posts"
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  example: "1"
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "ID поста для удаления"
+      tags:
+        - "posts"
       responses:
         "200":
           description: "Пост успешно удален"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Post deleted successfully"
+        "400":
+          description: "Неверный запрос"
         "500":
           description: "Ошибка сервера при удалении поста"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to delete post"
