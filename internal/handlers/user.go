@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"web.app/internal/models"
 	"web.app/internal/services"
@@ -10,12 +11,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var creds struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+type Creds struct {
+	ID           string `json:"id"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	var creds Creds
 	json.NewDecoder(r.Body).Decode(&creds)
 
 	err := models.RegisterUser(creds.Username, services.HashPassword(creds.Password))
@@ -28,16 +32,20 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message": "User registered successfully"}`))
 }
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	user_id := r.Context().Value("user_id")
+func GetUserHandler(w http.ResponseWriter, r *http.Request) {
+	var creds Creds
+	json.NewDecoder(r.Body).Decode(&creds)
 
-	user, err := models.GetUserByID(user_id)
+	user, err := models.GetUserByID(creds.ID)
 	if err != nil {
 		http.Error(w, `{"error": "User not found"}`, http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(map[string]string{
+		"id":       strconv.Itoa(user.ID),
+		"username": user.Username,
+	})
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +60,9 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "User logged out successfully"}`))
 }
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var creds Creds
 	json.NewDecoder(r.Body).Decode(&creds)
 
 	user, err := models.GetUserByUsernameAndPassword(creds.Username, services.HashPassword(creds.Password))
@@ -82,19 +92,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
 	})
 }
 
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	var requestData struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-	json.NewDecoder(r.Body).Decode(&requestData)
+	var creds Creds
+	json.NewDecoder(r.Body).Decode(&creds)
 
 	claims := &services.JWTClaims{}
-	token, err := jwt.ParseWithClaims(requestData.RefreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(creds.RefreshToken, claims, func(token *jwt.Token) (interface{}, error) {
 		return services.RefreshSecret, nil
 	})
 	if err != nil || !token.Valid {
@@ -104,7 +112,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Проверка refresh_token в базе данных
 	savedRefreshToken, err := models.GetRefreshToken(claims.UserID)
-	if err != nil || savedRefreshToken != requestData.RefreshToken {
+	if err != nil || savedRefreshToken != creds.RefreshToken {
 		http.Error(w, `{"error": "Refresh token not recognized"}`, http.StatusUnauthorized)
 		return
 	}
@@ -131,7 +139,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
 	})
 }

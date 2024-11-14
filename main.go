@@ -10,6 +10,7 @@ import (
 	"web.app/internal/handlers"
 	"web.app/internal/middlewares"
 
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -34,7 +35,7 @@ func main() {
 	r.HandleFunc("/auth/refresh/", handlers.RefreshTokenHandler).Methods("POST")
 	r.Handle("/auth/logout/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.LogoutHandler))).Methods("POST")
 
-	r.Handle("/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.HomeHandler))).Methods("GET")
+	r.Handle("/users/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetUserHandler))).Methods("GET")
 
 	r.Handle("/posts/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetPostsHandler))).Methods("GET")
 	r.Handle("/posts/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreatePostHandler))).Methods("POST")
@@ -47,9 +48,13 @@ func main() {
 		httpSwagger.URL("/docs/swagger.yaml"),
 	))
 
+	headersOk := gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
+	originsOk := gorillaHandlers.AllowedOrigins([]string{"http://localhost:8080"})
+	methodsOk := gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+
 	// Запуск сервера
 	fmt.Println("Starting server on :85...")
-	if err := http.ListenAndServe(":85", r); err != nil {
+	if err := http.ListenAndServe(":85", gorillaHandlers.CORS(originsOk, headersOk, methodsOk)(r)); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }

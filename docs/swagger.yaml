@@ -19,6 +19,43 @@ components:
       schema:
         type: string
       description: "Bearer токен для авторизации"
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        authorId:
+          type: string
+          example: "123"
+        text:
+          type: string
+          example: "This is a new post."
+        date:
+          type: string
+          example: "2023-11-15T10:00:00Z"
+    Pagination:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          example: 1
+        recordsPerPage:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 100
+    GetPostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
 security:
   - BearerAuth: []
 paths:
@@ -44,7 +81,7 @@ paths:
         "201":
           description: "Пользователь успешно зарегистрирован"
         "500":
-          description: "Ошибка сервера при регистрации пользователя"
+          description: "Ошибка при регистрации пользователя"
 
   /auth/login/:
     post:
@@ -67,6 +104,17 @@ paths:
       responses:
         "200":
           description: "Успешный вход"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR..."
+                  refreshToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR..."
         "401":
           description: "Неверные учетные данные"
 
@@ -88,34 +136,43 @@ paths:
       responses:
         "200":
           description: "Новый токен выдан"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR..."
+                  refreshToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR..."
         "401":
-          description: "Неверный или истекший refresh_token"
+          description: "Ошибка обновления access_token"
 
-  /auth/logout/:
-    post:
-      summary: "Выход из системы"
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-      tags:
-        - "auth"
-      responses:
-        "200":
-          description: "Успешный выход"
-        "500":
-          description: "Ошибка сервера при выходе"
-
-  /:
+  /users/:
     get:
-      summary: "Информация о пользователе"
+      summary: "Получение информации о пользователе"
+      tags:
+        - "users"
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-      tags:
-        - "user"
       responses:
         "200":
           description: "Информация о пользователе"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "123"
+                  username:
+                    type: string
+                    example: "testuser"
         "500":
-          description: "Пользователь не найден"
+          description: "Ошибка получения пользователя"
 
   /posts/:
     get:
@@ -132,18 +189,17 @@ paths:
               type: object
               properties:
                 pagination:
-                  type: object
-                  properties:
-                    pageIndex:
-                      type: integer
-                      example: 1
-                    recordsPerPage:
-                      type: integer
-                      example: 10
+                  $ref: '#/components/schemas/Pagination'
       responses:
         "200":
           description: "Список постов"
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPostsResponse'
+        "500":
+          description: "Ошибка получения постов"
+    
     post:
       summary: "Создание нового поста"
       parameters:
@@ -164,7 +220,7 @@ paths:
         "200":
           description: "Пост успешно создан"
         "500":
-          description: "Ошибка при создании поста"
+          description: "Ошибка создания поста"
 
   /posts/{id}/:
     put:
@@ -194,8 +250,16 @@ paths:
           description: "Пост успешно обновлен"
         "400":
           description: "Неверный запрос"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Missing required fields"
         "500":
-          description: "Ошибка сервера при обновлении поста"
+          description: "Ошибка обновления поста"
 
     delete:
       summary: "Удаление поста"
@@ -212,7 +276,5 @@ paths:
       responses:
         "200":
           description: "Пост успешно удален"
-        "400":
-          description: "Неверный запрос"
         "500":
-          description: "Ошибка сервера при удалении поста"
+          description: "Ошибка удаления поста"
