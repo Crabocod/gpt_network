@@ -48,13 +48,14 @@ func main() {
 		httpSwagger.URL("/docs/swagger.yaml"),
 	))
 
-	headersOk := gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
 	originsOk := gorillaHandlers.AllowedOrigins([]string{"http://localhost:8080"})
-	methodsOk := gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	methodsOk := gorillaHandlers.AllowedMethods([]string{"HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	headersOk := gorillaHandlers.AllowedHeaders([]string{"Origin", "Content-Type", "Authorization", "X-Requested-With", "access-control-expose-headers"})
+	handlerWithCORS := gorillaHandlers.CORS(originsOk, headersOk, methodsOk)(r)
 
 	// Запуск сервера
 	fmt.Println("Starting server on :85...")
-	if err := http.ListenAndServe(":85", gorillaHandlers.CORS(originsOk, headersOk, methodsOk)(r)); err != nil {
+	if err := http.ListenAndServe(":85", handlerWithCORS); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }
