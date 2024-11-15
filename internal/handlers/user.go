@@ -15,7 +15,7 @@ type Creds struct {
 	ID           string `json:"id"`
 	Username     string `json:"username"`
 	Password     string `json:"password"`
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {

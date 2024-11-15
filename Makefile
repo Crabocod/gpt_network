@@ -4,14 +4,17 @@ DB_NAME=gpt_network
 DB_HOST=localhost
 DB_PORT=5432
 
-up:
-	docker-compose up -d
-
-down:
-	docker-compose down
 
 migrate-up:
-	migrate -path internal/db/migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable" up
+	docker-compose exec db bash -c '\
+	for file in /docker-entrypoint-initdb.d/migrations/*.up.sql; do \
+		echo "Running migration: $$file"; \
+		psql -U $(DB_USER) -d $(DB_NAME) -f "$$file"; \
+	done'
 
 migrate-down:
-	migrate -path internal/db/migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable" down
+	docker-compose exec db bash -c '\
+	for file in /docker-entrypoint-initdb.d/migrations/*.down.sql; do \
+		echo "Rolling back migration: $$file"; \
+		psql -U $(DB_USER) -d $(DB_NAME) -f "$$file"; \
+	done'
