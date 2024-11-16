@@ -29,6 +29,9 @@ components:
         authorId:
           type: string
           example: "123"
+        authorName:
+          type: string
+          example: "username"
         text:
           type: string
           example: "This is a new post."

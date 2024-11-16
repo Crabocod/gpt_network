@@ -11,18 +11,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type Creds struct {
-	ID           string `json:"id"`
-	Username     string `json:"username"`
-	Password     string `json:"password"`
-	RefreshToken string `json:"refreshToken"`
-}
-
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	var creds Creds
-	json.NewDecoder(r.Body).Decode(&creds)
+	var user models.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
+		return
+	}
+	user.PasswordHash = services.HashPassword(user.PasswordHash)
 
-	err := models.RegisterUser(creds.Username, services.HashPassword(creds.Password))
+	err := user.Register()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to register user"}`, http.StatusInternalServerError)
 		return
@@ -33,25 +30,29 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	var creds Creds
-	json.NewDecoder(r.Body).Decode(&creds)
+	var user models.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
+		return
+	}
 
-	user, err := models.GetUserByID(creds.ID)
+	User, err := user.GetByID(user.ID)
 	if err != nil {
 		http.Error(w, `{"error": "User not found"}`, http.StatusInternalServerError)
 		return
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{
-		"id":       strconv.Itoa(user.ID),
-		"username": user.Username,
+		"id":       strconv.Itoa(User.ID),
+		"username": User.Username,
 	})
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("user_id").(int)
+	var refreshToken models.RefreshToken
+	refreshToken.UserID = r.Context().Value("user_id").(int)
 
-	err := models.DeleteRefreshToken(userID)
+	err := refreshToken.Delete()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to log out user"}`, http.StatusInternalServerError)
 		return
@@ -62,10 +63,15 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var creds Creds
-	json.NewDecoder(r.Body).Decode(&creds)
+	var user models.User
+	var refreshToken models.RefreshToken
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
+		return
+	}
+	user.PasswordHash = services.HashPassword(user.PasswordHash)
 
-	user, err := models.GetUserByUsernameAndPassword(creds.Username, services.HashPassword(creds.Password))
+	err := user.Login()
 	if err != nil {
 		http.Error(w, `{"error": "Invalid client credentials"}`, http.StatusUnauthorized)
 		return
@@ -78,14 +84,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	refreshToken, err := services.GenerateRefreshToken(user.ID)
+	refreshToken.UserID = user.ID
+	refreshToken.Token, err = services.GenerateRefreshToken(user.ID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
 		return
 	}
 
 	// Сохранение refresh_token в базе данных
-	err = models.SaveRefreshToken(user.ID, refreshToken)
+	err = refreshToken.Save()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to save refresh token"}`, http.StatusInternalServerError)
 		return
@@ -93,16 +100,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]string{
 		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
+		"refreshToken": refreshToken.Token,
 	})
 }
 
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	var creds Creds
-	json.NewDecoder(r.Body).Decode(&creds)
+	var refreshToken models.RefreshToken
+	json.NewDecoder(r.Body).Decode(&refreshToken)
 
 	claims := &services.JWTClaims{}
-	token, err := jwt.ParseWithClaims(creds.RefreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(refreshToken.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return services.RefreshSecret, nil
 	})
 	if err != nil || !token.Valid {
@@ -111,8 +118,8 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Проверка refresh_token в базе данных
-	savedRefreshToken, err := models.GetRefreshToken(claims.UserID)
-	if err != nil || savedRefreshToken != creds.RefreshToken {
+	savedRefreshToken, err := refreshToken.GetByUserID(claims.UserID)
+	if err != nil || savedRefreshToken != refreshToken.Token {
 		http.Error(w, `{"error": "Refresh token not recognized"}`, http.StatusUnauthorized)
 		return
 	}
@@ -125,14 +132,15 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Генерация нового refresh_token
-	refreshToken, err := services.GenerateRefreshToken(claims.UserID)
+	refreshToken.UserID = claims.UserID
+	refreshToken.Token, err = services.GenerateRefreshToken(claims.UserID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
 		return
 	}
 
 	// Сохранение refresh_token в базе данных
-	err = models.SaveRefreshToken(claims.UserID, refreshToken)
+	err = refreshToken.Save()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to save refresh token"}`, http.StatusInternalServerError)
 		return
@@ -140,6 +148,6 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]string{
 		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
+		"refreshToken": refreshToken.Token,
 	})
 }

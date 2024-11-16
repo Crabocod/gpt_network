@@ -42,6 +42,8 @@ func main() {
 	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdatePostHandler))).Methods("PUT")
 	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeletePostHandler))).Methods("DELETE")
 
+	// r.Handle("/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreatePostHandler))).Methods("POST")
+
 	r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", http.FileServer(http.Dir("./docs"))))
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(

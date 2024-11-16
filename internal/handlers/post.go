@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"web.app/internal/models"
 
@@ -18,13 +19,6 @@ type GetPostsRequest struct {
 	Pagination Pagination `json:"pagination"`
 }
 
-type Post struct {
-	ID       string `json:"id"`
-	AuthorID string `json:"authorId"`
-	Text     string `json:"text"`
-	Date     string `json:"date"`
-}
-
 type GetPostsResponse struct {
 	Posts      []models.Post      `json:"posts"`
 	Pagination PaginationResponse `json:"pagination"`
@@ -37,8 +31,8 @@ type PaginationResponse struct {
 }
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	var post Post
-	user_id := r.Context().Value("user_id").(int)
+	var post models.Post
+	post.AuthorID = r.Context().Value("user_id").(int)
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
@@ -49,7 +43,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := models.CreatePost(user_id, post.Text)
+	err := post.Save()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to create post"}`, http.StatusInternalServerError)
 		return
@@ -60,21 +54,20 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
-	postID := mux.Vars(r)["id"]
-
-	var post Post
-	user_id := r.Context().Value("user_id").(int)
+	var post models.Post
+	post.ID, _ = strconv.Atoi(mux.Vars(r)["id"])
+	post.AuthorID = r.Context().Value("user_id").(int)
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
 	}
 
-	if post.Text == "" || postID == "" {
+	if post.Text == "" || post.ID == 0 {
 		http.Error(w, `{"error": "Missing requierd fields"}`, http.StatusBadRequest)
 		return
 	}
 
-	err := models.UpdatePost(user_id, postID, post.Text)
+	err := post.Save()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to update post"}`, http.StatusInternalServerError)
 		return
@@ -85,15 +78,16 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
-	postID := mux.Vars(r)["id"]
-	user_id := r.Context().Value("user_id").(int)
+	var post models.Post
+	post.ID, _ = strconv.Atoi(mux.Vars(r)["id"])
+	post.AuthorID = r.Context().Value("user_id").(int)
 
-	if postID == "" {
+	if post.ID == 0 {
 		http.Error(w, `{"error": "Missing post_id field"}`, http.StatusBadRequest)
 		return
 	}
 
-	err := models.DeletePost(user_id, postID)
+	err := post.Delete()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to delete post"}`, http.StatusInternalServerError)
 		return
@@ -105,6 +99,7 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var request GetPostsRequest
+	var post models.Post
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
@@ -117,14 +112,14 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 		request.Pagination.RecordsPerPage = 10
 	}
 
-	totalRecords, err := models.CountPosts()
+	totalRecords, err := post.Count()
 	if err != nil {
 		http.Error(w, `{"error": "Failed to count posts"}`, http.StatusInternalServerError)
 		return
 	}
 
 	offset := (request.Pagination.PageIndex - 1) * request.Pagination.RecordsPerPage
-	posts, err := models.GetPosts(offset, request.Pagination.RecordsPerPage)
+	posts, err := post.GetList(offset, request.Pagination.RecordsPerPage)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to retrieve posts"}`, http.StatusInternalServerError)
 		return
