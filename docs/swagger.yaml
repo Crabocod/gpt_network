@@ -1,283 +1,467 @@
-openapi: "3.0.0"
-info:
-  title: "RESTful API"
-  description: "Документация для API"
-  version: "1.0.0"
-servers:
-  - url: "http://localhost:85"
+---
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
   parameters:
     AuthHeader:
-      name: Authorization
+      description: Bearer токен для авторизации
       in: header
+      name: Authorization
       required: true
       schema:
         type: string
-      description: "Bearer токен для авторизации"
   schemas:
-    Post:
-      type: object
+    Comment:
       properties:
-        id:
-          type: string
-          example: "1"
-        authorId:
-          type: string
-          example: "123"
+        authorID:
+          example: 123
+          type: integer
         authorName:
+          example: username
           type: string
-          example: "username"
-        text:
-          type: string
-          example: "This is a new post."
-        date:
-          type: string
-          example: "2023-11-15T10:00:00Z"
-    Pagination:
-      type: object
-      properties:
-        pageIndex:
-          type: integer
-          example: 1
-        recordsPerPage:
-          type: integer
-          example: 10
-        totalRecords:
-          type: integer
-          example: 100
-    GetPostsResponse:
-      type: object
-      properties:
-        posts:
-          type: array
+        children:
           items:
-            $ref: '#/components/schemas/Post'
+            $ref: '#/components/schemas/Comment'
+          type: array
+        createdAt:
+          example: '2023-11-15T10:00:00Z'
+          type: string
+        id:
+          example: 1
+          type: integer
+        postID:
+          example: 1
+          type: integer
+        text:
+          example: Комментарий к посту
+          type: string
+      type: object
+    GetPostsResponse:
+      properties:
         pagination:
           $ref: '#/components/schemas/Pagination'
-security:
-  - BearerAuth: []
+        posts:
+          items:
+            $ref: '#/components/schemas/Post'
+          type: array
+      type: object
+    Pagination:
+      properties:
+        pageIndex:
+          example: 1
+          type: integer
+        recordsPerPage:
+          example: 10
+          type: integer
+        totalRecords:
+          example: 100
+          type: integer
+      type: object
+    Post:
+      properties:
+        authorId:
+          example: '123'
+          type: string
+        authorName:
+          example: username
+          type: string
+        date:
+          example: '2023-11-15T10:00:00Z'
+          type: string
+        id:
+          example: '1'
+          type: string
+        text:
+          example: This is a new post.
+          type: string
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+info:
+  description: Документация для API
+  title: RESTful API
+  version: 1.0.0
+openapi: 3.0.0
 paths:
-  /auth/registration/:
-    post:
-      summary: "Регистрация пользователя"
-      tags:
-        - "auth"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  example: "testuser"
-                password:
-                  type: string
-                  example: "strongpassword"
-      responses:
-        "201":
-          description: "Пользователь успешно зарегистрирован"
-        "500":
-          description: "Ошибка при регистрации пользователя"
-
   /auth/login/:
     post:
-      summary: "Аутентификация пользователя"
-      tags:
-        - "auth"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              type: object
               properties:
-                username:
-                  type: string
-                  example: "testuser"
                 password:
+                  example: strongpassword
                   type: string
-                  example: "strongpassword"
+                username:
+                  example: testuser
+                  type: string
+              type: object
+        required: true
       responses:
-        "200":
-          description: "Успешный вход"
+        '200':
           content:
             application/json:
               schema:
-                type: object
                 properties:
                   accessToken:
+                    example: eyJhbGciOiJIUzI1NiIsInR...
                     type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR..."
                   refreshToken:
+                    example: eyJhbGciOiJIUzI1NiIsInR...
                     type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR..."
-        "401":
-          description: "Неверные учетные данные"
-
+                type: object
+          description: Успешный вход
+        '401':
+          description: Неверные учетные данные
+      summary: Аутентификация пользователя
+      tags:
+        - auth
   /auth/refresh/:
     post:
-      summary: "Обновление токена"
-      tags:
-        - "auth"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              type: object
               properties:
                 refreshToken:
+                  example: refresh_token_value
                   type: string
-                  example: "refresh_token_value"
+              type: object
+        required: true
       responses:
-        "200":
-          description: "Новый токен выдан"
+        '200':
           content:
             application/json:
               schema:
-                type: object
                 properties:
                   accessToken:
+                    example: eyJhbGciOiJIUzI1NiIsInR...
                     type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR..."
                   refreshToken:
+                    example: eyJhbGciOiJIUzI1NiIsInR...
                     type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR..."
-        "401":
-          description: "Ошибка обновления access_token"
-
-  /users/:
-    get:
-      summary: "Получение информации о пользователе"
-      tags:
-        - "users"
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-      responses:
-        "200":
-          description: "Информация о пользователе"
-          content:
-            application/json:
-              schema:
                 type: object
-                properties:
-                  id:
-                    type: string
-                    example: "123"
-                  username:
-                    type: string
-                    example: "testuser"
-        "500":
-          description: "Ошибка получения пользователя"
-
-  /posts/:
-    get:
-      summary: "Получение списка постов"
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
+          description: Новый токен выдан
+        '401':
+          description: Ошибка обновления access_token
+      summary: Обновление токена
       tags:
-        - "posts"
+        - auth
+  /auth/registration/:
+    post:
       requestBody:
-        required: true
         content:
           application/json:
             schema:
+              properties:
+                password:
+                  example: strongpassword
+                  type: string
+                username:
+                  example: testuser
+                  type: string
               type: object
+        required: true
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+        '500':
+          description: Ошибка при регистрации пользователя
+      summary: Регистрация пользователя
+      tags:
+        - auth
+  /comments/:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
               properties:
                 pagination:
                   $ref: '#/components/schemas/Pagination'
+                postID:
+                  description: ID поста, для которого нужно получить комментарии
+                  example: 1
+                  type: integer
+              type: object
+        required: true
       responses:
-        "200":
-          description: "Список постов"
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  comments:
+                    items:
+                      properties:
+                        authorID:
+                          example: 123
+                          type: integer
+                        authorName:
+                          example: username
+                          type: string
+                        children:
+                          items:
+                            $ref: '#/components/schemas/Comment'
+                          type: array
+                        createdAt:
+                          example: '2023-11-15T10:00:00Z'
+                          type: string
+                        id:
+                          example: 1
+                          type: integer
+                        postID:
+                          example: 1
+                          type: integer
+                        text:
+                          example: Комментарий к посту
+                          type: string
+                      type: object
+                    type: array
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                type: object
+          description: Список комментариев
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка получения комментариев
+      summary: Получение списка комментариев
+      tags:
+        - comments
+    post:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                parentID:
+                  description: ID родительского комментария (если есть)
+                  example: 2
+                  nullable: true
+                  type: integer
+                postID:
+                  example: 1
+                  type: integer
+                text:
+                  example: Это новый комментарий
+                  type: string
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Comment created successfully
+                    type: string
+                type: object
+          description: Комментарий успешно создан
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка создания комментария
+      summary: Создание нового комментария
+      tags:
+        - comments
+  /comments/{id}/:
+    delete:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+        - description: ID комментария для удаления
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Comment deleted successfully
+                    type: string
+                type: object
+          description: Комментарий успешно удален
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка удаления комментария
+      summary: Удаление комментария
+      tags:
+        - comments
+    put:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+        - description: ID комментария для обновления
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                text:
+                  example: Обновленный текст комментария
+                  type: string
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Comment updated successfully
+                    type: string
+                type: object
+          description: Комментарий успешно обновлен
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка обновления комментария
+      summary: Обновление комментария
+      tags:
+        - comments
+  /posts/:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+              type: object
+        required: true
+      responses:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetPostsResponse'
-        "500":
-          description: "Ошибка получения постов"
-    
+          description: Список постов
+        '500':
+          description: Ошибка получения постов
+      summary: Получение списка постов
+      tags:
+        - posts
     post:
-      summary: "Создание нового поста"
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-      tags:
-        - "posts"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              type: object
               properties:
                 text:
+                  example: This is a new post.
                   type: string
-                  example: "This is a new post."
+              type: object
+        required: true
       responses:
-        "200":
-          description: "Пост успешно создан"
-        "500":
-          description: "Ошибка создания поста"
-
+        '200':
+          description: Пост успешно создан
+        '500':
+          description: Ошибка создания поста
+      summary: Создание нового поста
+      tags:
+        - posts
   /posts/{id}/:
-    put:
-      summary: "Обновление поста"
+    delete:
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-        - name: id
+        - description: ID поста для удаления
           in: path
+          name: id
           required: true
           schema:
             type: string
-          description: "ID поста для обновления"
+      responses:
+        '200':
+          description: Пост успешно удален
+        '500':
+          description: Ошибка удаления поста
+      summary: Удаление поста
       tags:
-        - "posts"
+        - posts
+    put:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+        - description: ID поста для обновления
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              type: object
               properties:
                 text:
+                  example: Updated post content
                   type: string
-                  example: "Updated post content"
+              type: object
+        required: true
       responses:
-        "200":
-          description: "Пост успешно обновлен"
-        "400":
-          description: "Неверный запрос"
+        '200':
+          description: Пост успешно обновлен
+        '400':
           content:
             application/json:
               schema:
-                type: object
                 properties:
                   error:
+                    example: Missing required fields
                     type: string
-                    example: "Missing required fields"
-        "500":
-          description: "Ошибка обновления поста"
-
-    delete:
-      summary: "Удаление поста"
+                type: object
+          description: Неверный запрос
+        '500':
+          description: Ошибка обновления поста
+      summary: Обновление поста
+      tags:
+        - posts
+  /users/:
+    get:
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: "ID поста для удаления"
-      tags:
-        - "posts"
       responses:
-        "200":
-          description: "Пост успешно удален"
-        "500":
-          description: "Ошибка удаления поста"
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    example: '123'
+                    type: string
+                  username:
+                    example: testuser
+                    type: string
+                type: object
+          description: Информация о пользователе
+        '500':
+          description: Ошибка получения пользователя
+      summary: Получение информации о пользователе
+      tags:
+        - users
+security:
+  - BearerAuth: []
+servers:
+  - url: http://localhost:85

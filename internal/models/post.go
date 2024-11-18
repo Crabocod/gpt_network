@@ -9,6 +9,7 @@ type Post struct {
 	AuthorID   int    `db:"author_id" json:"authorID"`
 	AuthorName string `db:"author_name" json:"authorName"`
 	Text       string `db:"text" json:"text"`
+	Photo      string `db:"photo" json:"photo"`
 	CreatedAt  string `db:"created_at" json:"createdAt"`
 }
 
@@ -45,8 +46,8 @@ func (p *Post) Count() (int, error) {
 
 func (p *Post) Save() error {
 	if p.ID > 0 {
-		query := `UPDATE posts SET text = $1 WHERE id = $2 AND author_id = $3`
-		_, err := db.DB.Exec(query, p.Text, p.ID, p.AuthorID)
+		query := `UPDATE posts SET text = $1 WHERE id = $2`
+		_, err := db.DB.Exec(query, p.Text, p.ID)
 		if err != nil {
 			return err
 		}
@@ -61,7 +62,7 @@ func (p *Post) Save() error {
 }
 
 func (p *Post) Delete() error {
-	_, err := db.DB.Exec("DELETE FROM posts WHERE author_id = $1 AND id = $2", p.AuthorID, p.ID)
+	_, err := db.DB.Exec("DELETE FROM posts WHERE id = $1", p.ID)
 	if err != nil {
 		return err
 	}

@@ -10,11 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Pagination struct {
-	PageIndex      int `json:"pageIndex"`
-	RecordsPerPage int `json:"recordsPerPage"`
-}
-
 type GetPostsRequest struct {
 	Pagination Pagination `json:"pagination"`
 }
@@ -22,12 +17,6 @@ type GetPostsRequest struct {
 type GetPostsResponse struct {
 	Posts      []models.Post      `json:"posts"`
 	Pagination PaginationResponse `json:"pagination"`
-}
-
-type PaginationResponse struct {
-	PageIndex      int `json:"pageIndex"`
-	RecordsPerPage int `json:"recordsPerPage"`
-	TotalRecords   int `json:"totalRecords"`
 }
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +45,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 	post.ID, _ = strconv.Atoi(mux.Vars(r)["id"])
-	post.AuthorID = r.Context().Value("user_id").(int)
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
@@ -80,10 +68,9 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 	post.ID, _ = strconv.Atoi(mux.Vars(r)["id"])
-	post.AuthorID = r.Context().Value("user_id").(int)
 
 	if post.ID == 0 {
-		http.Error(w, `{"error": "Missing post_id field"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Missing post id field"}`, http.StatusBadRequest)
 		return
 	}
 

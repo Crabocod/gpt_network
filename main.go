@@ -42,7 +42,10 @@ func main() {
 	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdatePostHandler))).Methods("PUT")
 	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeletePostHandler))).Methods("DELETE")
 
-	// r.Handle("/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreatePostHandler))).Methods("POST")
+	r.Handle("/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetCommentsHandler))).Methods("GET")
+	r.Handle("/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreateCommentHandler))).Methods("POST")
+	r.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdateCommentHandler))).Methods("PUT")
+	r.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeleteCommentHandler))).Methods("DELETE")
 
 	r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", http.FileServer(http.Dir("./docs"))))
 
