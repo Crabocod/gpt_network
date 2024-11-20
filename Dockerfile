@@ -7,7 +7,7 @@ WORKDIR /go/src/app
 COPY . .
 
 # Загружаем зависимости и собираем приложение
-RUN go mod download && go build -o app main.go
+RUN go mod download && go build -o app cmd/main.go
 
 # Используем минимальный образ для запуска
 FROM alpine:latest

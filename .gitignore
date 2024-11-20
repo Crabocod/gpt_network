@@ -1,2 +1,3 @@
 .vscode/
 .idea/
+internal/db/postgresql_data/

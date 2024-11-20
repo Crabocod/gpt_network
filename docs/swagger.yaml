@@ -43,6 +43,15 @@ components:
             $ref: '#/components/schemas/Post'
           type: array
       type: object
+    PaginationBody:
+      properties:
+        pageIndex:
+          example: 1
+          type: integer
+        recordsPerPage:
+          example: 10
+          type: integer
+      type: object
     Pagination:
       properties:
         pageIndex:
@@ -172,6 +181,18 @@ paths:
       summary: Регистрация пользователя
       tags:
         - auth
+  /auth/logout/:
+    post:
+    parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+    responses:
+        '200':
+          description: Успешный выход
+        '500':
+          description: Ошибка при выходе пользователя
+      summary: Выход пользователя
+      tags:
+        - auth
   /comments/:
     get:
       parameters:
@@ -182,7 +203,7 @@ paths:
             schema:
               properties:
                 pagination:
-                  $ref: '#/components/schemas/Pagination'
+                  $ref: '#/components/schemas/PaginationBody'
                 postID:
                   description: ID поста, для которого нужно получить комментарии
                   example: 1
@@ -347,7 +368,7 @@ paths:
             schema:
               properties:
                 pagination:
-                  $ref: '#/components/schemas/Pagination'
+                  $ref: '#/components/schemas/PaginationBody'
               type: object
         required: true
       responses:
