@@ -88,21 +88,15 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	var request GetCommentsRequest
 	var comment models.Comment
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
-		return
-	}
 
-	if request.PostID == 0 {
-		http.Error(w, `{"error": "Missing post id field"}`, http.StatusBadRequest)
-		return
-	}
+	queryParams := r.URL.Query()
+	request.Pagination.PageIndex, _ = strconv.Atoi(queryParams.Get("pageIndex"))
+	request.Pagination.RecordsPerPage, _ = strconv.Atoi(queryParams.Get("recordsPerPage"))
+	request.PostID, _ = strconv.Atoi(queryParams.Get("postID"))
 
-	if request.Pagination.PageIndex == 0 {
-		request.Pagination.PageIndex = 1
-	}
-	if request.Pagination.RecordsPerPage == 0 {
-		request.Pagination.RecordsPerPage = 10
+	if request.PostID == 0 || request.Pagination.RecordsPerPage == 0 || request.Pagination.PageIndex == 0 {
+		http.Error(w, `{"error": "Missing requierd fields"}`, http.StatusBadRequest)
+		return
 	}
 
 	totalRecords, err := comment.Count(request.PostID)

@@ -87,16 +87,14 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var request GetPostsRequest
 	var post models.Post
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
-		return
-	}
 
-	if request.Pagination.PageIndex == 0 {
-		request.Pagination.PageIndex = 1
-	}
-	if request.Pagination.RecordsPerPage == 0 {
-		request.Pagination.RecordsPerPage = 10
+	queryParams := r.URL.Query()
+	request.Pagination.PageIndex, _ = strconv.Atoi(queryParams.Get("pageIndex"))
+	request.Pagination.RecordsPerPage, _ = strconv.Atoi(queryParams.Get("recordsPerPage"))
+
+	if request.Pagination.PageIndex == 0 || request.Pagination.RecordsPerPage == 0 {
+		http.Error(w, `{"error": "Missing requierd fields"}`, http.StatusBadRequest)
+		return
 	}
 
 	totalRecords, err := post.Count()

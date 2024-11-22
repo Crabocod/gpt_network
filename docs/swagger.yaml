@@ -43,15 +43,6 @@ components:
             $ref: '#/components/schemas/Post'
           type: array
       type: object
-    PaginationBody:
-      properties:
-        pageIndex:
-          example: 1
-          type: integer
-        recordsPerPage:
-          example: 10
-          type: integer
-      type: object
     Pagination:
       properties:
         pageIndex:
@@ -62,6 +53,15 @@ components:
           type: integer
         totalRecords:
           example: 100
+          type: integer
+      type: object
+    PaginationBody:
+      properties:
+        pageIndex:
+          example: 1
+          type: integer
+        recordsPerPage:
+          example: 10
           type: integer
       type: object
     Post:
@@ -127,6 +127,18 @@ paths:
       summary: Аутентификация пользователя
       tags:
         - auth
+  /auth/logout/:
+    parameters:
+      - $ref: '#/components/parameters/AuthHeader'
+    post: null
+    responses:
+      '200':
+        description: Успешный выход
+      '500':
+        description: Ошибка при выходе пользователя
+      summary: Выход пользователя
+      tags:
+        - auth
   /auth/refresh/:
     post:
       requestBody:
@@ -181,35 +193,31 @@ paths:
       summary: Регистрация пользователя
       tags:
         - auth
-  /auth/logout/:
-    post:
-    parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-    responses:
-        '200':
-          description: Успешный выход
-        '500':
-          description: Ошибка при выходе пользователя
-      summary: Выход пользователя
-      tags:
-        - auth
   /comments/:
     get:
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                pagination:
-                  $ref: '#/components/schemas/PaginationBody'
-                postID:
-                  description: ID поста, для которого нужно получить комментарии
-                  example: 1
-                  type: integer
-              type: object
-        required: true
+        - description: Индекс страницы для пагинации
+          in: query
+          name: pageIndex
+          required: true
+          schema:
+            example: 1
+            type: integer
+        - description: Количество записей на странице
+          in: query
+          name: recordsPerPage
+          required: true
+          schema:
+            example: 10
+            type: integer
+        - description: ID поста, для которого нужно получить комментарии
+          in: query
+          name: postID
+          required: true
+          schema:
+            example: 1
+            type: integer
       responses:
         '200':
           content:
@@ -362,15 +370,20 @@ paths:
     get:
       parameters:
         - $ref: '#/components/parameters/AuthHeader'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                pagination:
-                  $ref: '#/components/schemas/PaginationBody'
-              type: object
-        required: true
+        - description: Индекс страницы для пагинации
+          in: query
+          name: pageIndex
+          required: true
+          schema:
+            example: 1
+            type: integer
+        - description: Количество записей на странице
+          in: query
+          name: recordsPerPage
+          required: true
+          schema:
+            example: 10
+            type: integer
       responses:
         '200':
           content:
@@ -378,6 +391,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetPostsResponse'
           description: Список постов
+        '400':
+          description: Неверный запрос
         '500':
           description: Ошибка получения постов
       summary: Получение списка постов
