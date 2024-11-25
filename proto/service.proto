@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package textgen;
+
+option go_package = "./go/textgen";
+
+service TextGenService {
+    // Метод для генерации текста
+    rpc GenerateText (GenerateRequest) returns (GenerateResponse);
+}
+
+message GenerateRequest {
+    string question = 1;
+}
+
+message GenerateResponse {
+    string answer = 1;
+}

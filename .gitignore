@@ -1,3 +1,4 @@
 .vscode/
 .idea/
-internal/db/postgresql_data/
+api-service/internal/db/postgresql_data/
+python-service/model
