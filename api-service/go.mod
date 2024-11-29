@@ -12,7 +12,6 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/swaggo/http-swagger v1.3.4
 	google.golang.org/grpc v1.68.0
-	proto/go v0.0.0-00010101000000-000000000000
 )
 
 require (

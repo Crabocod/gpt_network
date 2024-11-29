@@ -24,18 +24,18 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x07textgen\"#\n\x0fGenerateRequest\x12\x10\n\x08question\x18\x01 \x01(\t\"\"\n\x10GenerateResponse\x12\x0e\n\x06\x61nswer\x18\x01 \x01(\t2U\n\x0eTextGenService\x12\x43\n\x0cGenerateText\x12\x18.textgen.GenerateRequest\x1a\x19.textgen.GenerateResponseB\x0eZ\x0c./go/textgenb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x05proto\"#\n\x0fGenerateRequest\x12\x10\n\x08question\x18\x01 \x01(\t\"\"\n\x10GenerateResponse\x12\x0e\n\x06\x61nswer\x18\x01 \x01(\t2Q\n\x0eTextGenService\x12?\n\x0cGenerateText\x12\x16.proto.GenerateRequest\x1a\x17.proto.GenerateResponseB\x06Z\x04./gob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'Z\014./go/textgen'
-  _globals['_GENERATEREQUEST']._serialized_start=26
-  _globals['_GENERATEREQUEST']._serialized_end=61
-  _globals['_GENERATERESPONSE']._serialized_start=63
-  _globals['_GENERATERESPONSE']._serialized_end=97
-  _globals['_TEXTGENSERVICE']._serialized_start=99
-  _globals['_TEXTGENSERVICE']._serialized_end=184
+  _globals['DESCRIPTOR']._serialized_options = b'Z\004./go'
+  _globals['_GENERATEREQUEST']._serialized_start=24
+  _globals['_GENERATEREQUEST']._serialized_end=59
+  _globals['_GENERATERESPONSE']._serialized_start=61
+  _globals['_GENERATERESPONSE']._serialized_end=95
+  _globals['_TEXTGENSERVICE']._serialized_start=97
+  _globals['_TEXTGENSERVICE']._serialized_end=178
 # @@protoc_insertion_point(module_scope)

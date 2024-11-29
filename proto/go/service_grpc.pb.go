@@ -4,7 +4,7 @@
 // - protoc             v5.28.3
 // source: service.proto
 
-package textgen
+package _go
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TextGenService_GenerateText_FullMethodName = "/textgen.TextGenService/GenerateText"
+	TextGenService_GenerateText_FullMethodName = "/proto.TextGenService/GenerateText"
 )
 
 // TextGenServiceClient is the client API for TextGenService service.
@@ -110,7 +110,7 @@ func _TextGenService_GenerateText_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TextGenService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "textgen.TextGenService",
+	ServiceName: "proto.TextGenService",
 	HandlerType: (*TextGenServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

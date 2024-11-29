@@ -2,7 +2,7 @@
 
 PROTO_DIR="."
 GO_OUT_DIR="."
-PYTHON_OUT_DIR="./python/textgen"
+PYTHON_OUT_DIR="./python"
 
 mkdir -p ${PYTHON_OUT_DIR}
 

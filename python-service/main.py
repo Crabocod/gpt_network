@@ -3,10 +3,16 @@ from concurrent import futures
 import service_pb2
 import service_pb2_grpc
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 # Загрузка токенизатора и модели
-tokenizer = AutoTokenizer.from_pretrained("./model")
-model = AutoModelForCausalLM.from_pretrained("./model")
+try:
+    tokenizer = AutoTokenizer.from_pretrained("./model")
+    model = AutoModelForCausalLM.from_pretrained("./model")
+    print("Модель и токенизатор загружены успешно.")
+except Exception as e:
+    print(f"Ошибка при загрузке модели: {e}")
+    exit(1)
 
 class TextGenService(service_pb2_grpc.TextGenServiceServicer):
     def GenerateText(self, request, context):
@@ -38,6 +44,7 @@ def serve():
     server.add_insecure_port('[::]:50051')
     server.start()
     server.wait_for_termination()
+    print("Сервер Python запущен на порту 50051...")
 
 if __name__ == "__main__":
     serve()

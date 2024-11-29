@@ -1,3 +1,5 @@
-flask
+grpcio
+grpcio-tools
 transformers
 torch
+grpcio-reflection

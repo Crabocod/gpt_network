@@ -35,7 +35,7 @@ class TextGenServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GenerateText = channel.unary_unary(
-                '/textgen.TextGenService/GenerateText',
+                '/proto.TextGenService/GenerateText',
                 request_serializer=service__pb2.GenerateRequest.SerializeToString,
                 response_deserializer=service__pb2.GenerateResponse.FromString,
                 _registered_method=True)
@@ -61,9 +61,9 @@ def add_TextGenServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'textgen.TextGenService', rpc_method_handlers)
+            'proto.TextGenService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('textgen.TextGenService', rpc_method_handlers)
+    server.add_registered_method_handlers('proto.TextGenService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -84,7 +84,7 @@ class TextGenService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/textgen.TextGenService/GenerateText',
+            '/proto.TextGenService/GenerateText',
             service__pb2.GenerateRequest.SerializeToString,
             service__pb2.GenerateResponse.FromString,
             options,

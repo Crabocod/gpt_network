@@ -2,3 +2,4 @@
 .idea/
 api-service/internal/db/postgresql_data/
 python-service/model
+*/.DS_Store

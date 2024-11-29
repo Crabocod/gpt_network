@@ -7,39 +7,33 @@ import (
 	"net/http"
 	"time"
 
-	pb "proto/go/textgen"
+	pb "web.app/internal/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func GenerateText(w http.ResponseWriter, r *http.Request) {
-	// Создаем контекст с таймаутом
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
 
-	// Создаем соединение с gRPC сервером
-	conn, err := grpc.NewClient(
-		"localhost:50051", // адрес сервера
-		grpc.WithTransportCredentials(insecure.NewCredentials()), // Указываем, что соединение небезопасное
-	)
+	opts := []grpc.DialOption{
+		grpc.WithInsecure(),
+	}
+
+	conn, err := grpc.Dial("python_service:50051", opts...)
 	if err != nil {
 		log.Fatalf("Не удалось подключиться: %v", err)
 	}
 	defer conn.Close()
 
-	// Проверяем состояние соединения
-	if conn.GetState() != connectivity.Ready {
-		log.Fatalf("Соединение не готово: %v", conn.GetState())
+	for conn.GetState() != connectivity.Ready {
+		log.Println("Ожидание установления соединения...")
+		time.Sleep(500 * time.Millisecond)
 	}
 
-	// Создаем клиента с использованием нового соединения
 	client := pb.NewTextGenServiceClient(conn)
 
-	// Вызов gRPC метода
 	question := "Привет, как дела?"
-	resp, err := client.GenerateText(ctx, &pb.GenerateRequest{Question: question})
+	resp, err := client.GenerateText(context.Background(), &pb.GenerateRequest{Question: question})
 	if err != nil {
 		log.Fatalf("Ошибка при вызове GenerateText: %v", err)
 	}
