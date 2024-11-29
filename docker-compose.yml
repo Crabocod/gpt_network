@@ -1,5 +1,5 @@
 services:
-  app:
+  api:
     build:
       context: ./api-service
       dockerfile: Dockerfile
@@ -9,14 +9,14 @@ services:
       - "85:85"
     depends_on:
       - db
-      - python_service
+      - textgen
     restart: on-failure
     networks:
       - app_network
 
-  python_service:
+  textgen:
     build:
-      context: ./python-service
+      context: ./textgen-service
       dockerfile: Dockerfile
     ports:
       - "50051:50051"
@@ -29,8 +29,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - app
-      - python_service
+      - api
+      - textgen
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     restart: on-failure

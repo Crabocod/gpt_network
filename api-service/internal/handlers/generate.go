@@ -19,7 +19,7 @@ func GenerateText(w http.ResponseWriter, r *http.Request) {
 		grpc.WithInsecure(),
 	}
 
-	conn, err := grpc.Dial("python_service:50051", opts...)
+	conn, err := grpc.Dial("textgen:50051", opts...)
 	if err != nil {
 		log.Fatalf("Не удалось подключиться: %v", err)
 	}
