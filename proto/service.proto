@@ -2,17 +2,31 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "./go";
+option go_package = "./go/proto";
 
+// Сервис для генерации текста
 service TextGenService {
-    // Метод для генерации текста
     rpc GenerateText (GenerateRequest) returns (GenerateResponse);
+}
+
+// Сервис для сохранения сгенерированного текста в БД
+service SaveTextService {
+    rpc SaveGeneratedText (SaveRequest) returns (SaveResponse);
 }
 
 message GenerateRequest {
     string question = 1;
+    string model_name = 2;
 }
 
 message GenerateResponse {
     string answer = 1;
+}
+
+message SaveRequest {
+    string generated_text = 1;  // Текст, который нужно сохранить
+}
+
+message SaveResponse {
+    bool success = 1;  // Флаг успешности сохранения
 }

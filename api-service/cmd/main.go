@@ -3,16 +3,20 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"sync"
 
 	"web.app/internal/config"
 	"web.app/internal/db"
 	"web.app/internal/handlers"
 	"web.app/internal/middlewares"
+	pb "web.app/internal/proto"
 
 	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -47,8 +51,6 @@ func main() {
 	r.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdateCommentHandler))).Methods("PUT")
 	r.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeleteCommentHandler))).Methods("DELETE")
 
-	r.Handle("/generate/post/", http.HandlerFunc(handlers.GenerateText)).Methods("POST")
-
 	r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", http.FileServer(http.Dir("./docs"))))
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
@@ -60,9 +62,32 @@ func main() {
 	headersOk := gorillaHandlers.AllowedHeaders([]string{"Origin", "Content-Type", "Authorization", "X-Requested-With", "access-control-expose-headers"})
 	handlerWithCORS := gorillaHandlers.CORS(originsOk, headersOk, methodsOk)(r)
 
-	// Запуск сервера
-	fmt.Println("Starting server on :85...")
-	if err := http.ListenAndServe(":85", handlerWithCORS); err != nil {
-		log.Fatalf("Server failed to start: %v", err)
-	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		fmt.Println("Starting HTTP server on :85...")
+		if err := http.ListenAndServe(":85", handlerWithCORS); err != nil {
+			log.Fatalf("HTTP server failed to start: %v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		server := grpc.NewServer()
+		pb.RegisterSaveTextServiceServer(server, &handlers.SaveTextService{})
+
+		listener, err := net.Listen("tcp", ":50052")
+		if err != nil {
+			log.Fatalf("Ошибка при запуске gRPC-сервера: %v", err)
+		}
+
+		log.Println("gRPC-сервис запущен на порту 50052")
+		if err := server.Serve(listener); err != nil {
+			log.Fatalf("gRPC-сервер завершился с ошибкой: %v", err)
+		}
+	}()
+
+	wg.Wait()
 }
