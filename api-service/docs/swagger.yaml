@@ -128,14 +128,30 @@ paths:
       tags:
         - auth
   /auth/logout/:
-    parameters:
-      - $ref: '#/components/parameters/AuthHeader'
-    post: null
-    responses:
-      '200':
-        description: Успешный выход
-      '500':
-        description: Ошибка при выходе пользователя
+    post:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: User logged out successfully
+                    type: string
+                type: object
+          description: Успешный выход
+        '500':
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    example: Failed to log out user
+                    type: string
+                type: object
+          description: Ошибка при выходе пользователя
       summary: Выход пользователя
       tags:
         - auth
@@ -193,114 +209,6 @@ paths:
       summary: Регистрация пользователя
       tags:
         - auth
-  /comments/:
-    get:
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-        - description: Индекс страницы для пагинации
-          in: query
-          name: pageIndex
-          required: true
-          schema:
-            example: 1
-            type: integer
-        - description: Количество записей на странице
-          in: query
-          name: recordsPerPage
-          required: true
-          schema:
-            example: 10
-            type: integer
-        - description: ID поста, для которого нужно получить комментарии
-          in: query
-          name: postID
-          required: true
-          schema:
-            example: 1
-            type: integer
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties:
-                  comments:
-                    items:
-                      properties:
-                        authorID:
-                          example: 123
-                          type: integer
-                        authorName:
-                          example: username
-                          type: string
-                        children:
-                          items:
-                            $ref: '#/components/schemas/Comment'
-                          type: array
-                        createdAt:
-                          example: '2023-11-15T10:00:00Z'
-                          type: string
-                        id:
-                          example: 1
-                          type: integer
-                        postID:
-                          example: 1
-                          type: integer
-                        text:
-                          example: Комментарий к посту
-                          type: string
-                      type: object
-                    type: array
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
-                type: object
-          description: Список комментариев
-        '400':
-          description: Неверный запрос
-        '500':
-          description: Ошибка получения комментариев
-      summary: Получение списка комментариев
-      tags:
-        - comments
-    post:
-      parameters:
-        - $ref: '#/components/parameters/AuthHeader'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                parentID:
-                  description: ID родительского комментария (если есть)
-                  example: 2
-                  nullable: true
-                  type: integer
-                postID:
-                  example: 1
-                  type: integer
-                text:
-                  example: Это новый комментарий
-                  type: string
-              type: object
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties:
-                  message:
-                    example: Comment created successfully
-                    type: string
-                type: object
-          description: Комментарий успешно создан
-        '400':
-          description: Неверный запрос
-        '500':
-          description: Ошибка создания комментария
-      summary: Создание нового комментария
-      tags:
-        - comments
   /comments/{id}/:
     delete:
       parameters:
@@ -474,6 +382,121 @@ paths:
       summary: Обновление поста
       tags:
         - posts
+  /posts/{post_id}/comments/:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+        - description: ID поста, для которого создаётся комментарий
+          in: path
+          name: post_id
+          required: true
+          schema:
+            example: 1
+            type: integer
+        - description: Индекс страницы для пагинации
+          in: query
+          name: pageIndex
+          required: true
+          schema:
+            example: 1
+            type: integer
+        - description: Количество записей на странице
+          in: query
+          name: recordsPerPage
+          required: true
+          schema:
+            example: 10
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  comments:
+                    items:
+                      properties:
+                        authorID:
+                          example: 123
+                          type: integer
+                        authorName:
+                          example: username
+                          type: string
+                        children:
+                          items:
+                            $ref: '#/components/schemas/Comment'
+                          type: array
+                        createdAt:
+                          example: '2023-11-15T10:00:00Z'
+                          type: string
+                        id:
+                          example: 1
+                          type: integer
+                        postID:
+                          example: 1
+                          type: integer
+                        text:
+                          example: Комментарий к посту
+                          type: string
+                      type: object
+                    type: array
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                type: object
+          description: Список комментариев
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка получения комментариев
+      summary: Получение списка комментариев
+      tags:
+        - comments
+    post:
+      parameters:
+        - $ref: '#/components/parameters/AuthHeader'
+        - description: ID поста, для которого создаётся комментарий
+          in: path
+          name: post_id
+          required: true
+          schema:
+            example: 1
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                parentID:
+                  description: ID родительского комментария (если есть)
+                  example: 2
+                  nullable: true
+                  type: integer
+                postID:
+                  example: 1
+                  type: integer
+                text:
+                  example: Это новый комментарий
+                  type: string
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Comment created successfully
+                    type: string
+                type: object
+          description: Комментарий успешно создан
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка создания комментария
+      summary: Создание нового комментария
+      tags:
+        - comments
   /users/:
     get:
       parameters:

@@ -30,9 +30,18 @@ func (u *User) Login() error {
 	return nil
 }
 
-func (u *User) GetByID(id int) (*User, error) {
+func GetUserByID(id int) (*User, error) {
 	var user User
-	err := db.DB.Get(&user, "SELECT * FROM users WHERE id=$1", u.ID)
+	err := db.DB.Get(&user, "SELECT * FROM users WHERE id=$1", id)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func GetUserByName(name string) (*User, error) {
+	var user User
+	err := db.DB.Get(&user, "SELECT * FROM users WHERE username=$1", name)
 	if err != nil {
 		return nil, err
 	}

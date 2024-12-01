@@ -9,9 +9,14 @@ service TextGenService {
     rpc GenerateText (GenerateRequest) returns (GenerateResponse);
 }
 
-// Сервис для сохранения сгенерированного текста в БД
+// Сервис для сохранения сгенерированного текста в Пост
 service SaveTextService {
     rpc SaveGeneratedText (SaveRequest) returns (SaveResponse);
+}
+
+// Сервис для получения поста
+service GetPostService {
+    rpc GetPost (GetPostRequest) returns (GetPostResponse);
 }
 
 message GenerateRequest {
@@ -24,9 +29,18 @@ message GenerateResponse {
 }
 
 message SaveRequest {
-    string generated_text = 1;  // Текст, который нужно сохранить
+    string generated_text = 1;
+    string author_name = 2;
 }
 
 message SaveResponse {
-    bool success = 1;  // Флаг успешности сохранения
+    bool success = 1;
+}
+
+message GetPostRequest {}
+
+message GetPostResponse {
+    string post_id = 1;
+    string post_text = 2;
+    string author_name = 3;
 }

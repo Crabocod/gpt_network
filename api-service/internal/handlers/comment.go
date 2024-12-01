@@ -23,6 +23,8 @@ type GetCommentsResponse struct {
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var comment models.Comment
 	comment.AuthorID = r.Context().Value("user_id").(int)
+	comment.PostID, _ = strconv.Atoi(mux.Vars(r)["post_id"])
+
 	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
@@ -92,7 +94,7 @@ func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 	request.Pagination.PageIndex, _ = strconv.Atoi(queryParams.Get("pageIndex"))
 	request.Pagination.RecordsPerPage, _ = strconv.Atoi(queryParams.Get("recordsPerPage"))
-	request.PostID, _ = strconv.Atoi(queryParams.Get("postID"))
+	request.PostID, _ = strconv.Atoi(mux.Vars(r)["post_id"])
 
 	if request.PostID == 0 || request.Pagination.RecordsPerPage == 0 || request.Pagination.PageIndex == 0 {
 		http.Error(w, `{"error": "Missing requierd fields"}`, http.StatusBadRequest)

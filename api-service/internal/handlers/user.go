@@ -36,7 +36,7 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	User, err := user.GetByID(user.ID)
+	User, err := models.GetUserByID(user.ID)
 	if err != nil {
 		http.Error(w, `{"error": "User not found"}`, http.StatusInternalServerError)
 		return

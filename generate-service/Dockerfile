@@ -16,4 +16,4 @@ WORKDIR /root
 # Копируем скомпилированное приложение и все необходимые файлы
 COPY --from=builder /go/src/app/app .
 
-CMD ["./app"]
+# CMD ["./app"]

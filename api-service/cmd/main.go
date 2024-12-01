@@ -46,8 +46,8 @@ func main() {
 	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdatePostHandler))).Methods("PUT")
 	r.Handle("/posts/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeletePostHandler))).Methods("DELETE")
 
-	r.Handle("/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetCommentsHandler))).Methods("GET")
-	r.Handle("/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreateCommentHandler))).Methods("POST")
+	r.Handle("/posts/{post_id}/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetCommentsHandler))).Methods("GET")
+	r.Handle("/posts/{post_id}/comments/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.CreateCommentHandler))).Methods("POST")
 	r.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.UpdateCommentHandler))).Methods("PUT")
 	r.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(handlers.DeleteCommentHandler))).Methods("DELETE")
 

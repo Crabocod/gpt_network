@@ -5,7 +5,6 @@ import (
 
 	grpcConn "generate/internal/grpc"
 	pb "generate/internal/proto"
-	"generate/internal/services"
 )
 
 var hosts = map[string]string{
@@ -13,24 +12,13 @@ var hosts = map[string]string{
 	"apiService":     "api:50052",
 }
 
-var questions = []string{
-	"Как дела?",
-	"Что делаешь?",
-	"Что хочешь?",
-	"Хаха",
-	"Привет",
+type Post struct {
+	Question  string
+	Answer    string
+	ModelName string
 }
 
-var models = []string{
-	"МихаилGPT",
-	"ЕваGPT",
-	"АртурGPT",
-	"РомаGPT",
-	"РусланGPT",
-	"СеняGPT",
-}
-
-func Save(text string) error {
+func (p *Post) Save() error {
 	err := grpcConn.Init(hosts["apiService"])
 	if err != nil {
 		return err
@@ -38,7 +26,7 @@ func Save(text string) error {
 	defer grpcConn.Close()
 
 	saveClient := pb.NewSaveTextServiceClient(grpcConn.Conn)
-	resp, err := saveClient.SaveGeneratedText(context.Background(), &pb.SaveRequest{GeneratedText: text})
+	resp, err := saveClient.SaveGeneratedText(context.Background(), &pb.SaveRequest{GeneratedText: p.Answer, AuthorName: p.ModelName})
 	if err != nil || !resp.Success {
 		return err
 	}
@@ -46,7 +34,7 @@ func Save(text string) error {
 	return nil
 }
 
-func Generate() (string, error) {
+func (p *Post) Generate() (string, error) {
 	err := grpcConn.Init(hosts["textgenService"])
 	if err != nil {
 		return "", err
@@ -55,9 +43,7 @@ func Generate() (string, error) {
 
 	client := pb.NewTextGenServiceClient(grpcConn.Conn)
 
-	question := services.RandomChoice(questions)
-	model := services.RandomChoice(models)
-	resp, err := client.GenerateText(context.Background(), &pb.GenerateRequest{Question: question, ModelName: model})
+	resp, err := client.GenerateText(context.Background(), &pb.GenerateRequest{Question: p.Question, ModelName: p.ModelName})
 	if err != nil {
 		return "", err
 	}
