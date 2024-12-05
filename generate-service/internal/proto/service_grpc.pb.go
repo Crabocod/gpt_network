@@ -125,105 +125,317 @@ var TextGenService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	SaveTextService_SaveGeneratedText_FullMethodName = "/proto.SaveTextService/SaveGeneratedText"
+	SavePostService_SavePost_FullMethodName = "/proto.SavePostService/SavePost"
 )
 
-// SaveTextServiceClient is the client API for SaveTextService service.
+// SavePostServiceClient is the client API for SavePostService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Сервис для сохранения сгенерированного текста в БД
-type SaveTextServiceClient interface {
-	SaveGeneratedText(ctx context.Context, in *SaveRequest, opts ...grpc.CallOption) (*SaveResponse, error)
+// Сервис для сохранения сгенерированного текста в Пост
+type SavePostServiceClient interface {
+	SavePost(ctx context.Context, in *SavePostRequest, opts ...grpc.CallOption) (*SavePostResponse, error)
 }
 
-type saveTextServiceClient struct {
+type savePostServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewSaveTextServiceClient(cc grpc.ClientConnInterface) SaveTextServiceClient {
-	return &saveTextServiceClient{cc}
+func NewSavePostServiceClient(cc grpc.ClientConnInterface) SavePostServiceClient {
+	return &savePostServiceClient{cc}
 }
 
-func (c *saveTextServiceClient) SaveGeneratedText(ctx context.Context, in *SaveRequest, opts ...grpc.CallOption) (*SaveResponse, error) {
+func (c *savePostServiceClient) SavePost(ctx context.Context, in *SavePostRequest, opts ...grpc.CallOption) (*SavePostResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SaveResponse)
-	err := c.cc.Invoke(ctx, SaveTextService_SaveGeneratedText_FullMethodName, in, out, cOpts...)
+	out := new(SavePostResponse)
+	err := c.cc.Invoke(ctx, SavePostService_SavePost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// SaveTextServiceServer is the server API for SaveTextService service.
-// All implementations must embed UnimplementedSaveTextServiceServer
+// SavePostServiceServer is the server API for SavePostService service.
+// All implementations must embed UnimplementedSavePostServiceServer
 // for forward compatibility.
 //
-// Сервис для сохранения сгенерированного текста в БД
-type SaveTextServiceServer interface {
-	SaveGeneratedText(context.Context, *SaveRequest) (*SaveResponse, error)
-	mustEmbedUnimplementedSaveTextServiceServer()
+// Сервис для сохранения сгенерированного текста в Пост
+type SavePostServiceServer interface {
+	SavePost(context.Context, *SavePostRequest) (*SavePostResponse, error)
+	mustEmbedUnimplementedSavePostServiceServer()
 }
 
-// UnimplementedSaveTextServiceServer must be embedded to have
+// UnimplementedSavePostServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedSaveTextServiceServer struct{}
+type UnimplementedSavePostServiceServer struct{}
 
-func (UnimplementedSaveTextServiceServer) SaveGeneratedText(context.Context, *SaveRequest) (*SaveResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveGeneratedText not implemented")
+func (UnimplementedSavePostServiceServer) SavePost(context.Context, *SavePostRequest) (*SavePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SavePost not implemented")
 }
-func (UnimplementedSaveTextServiceServer) mustEmbedUnimplementedSaveTextServiceServer() {}
-func (UnimplementedSaveTextServiceServer) testEmbeddedByValue()                         {}
+func (UnimplementedSavePostServiceServer) mustEmbedUnimplementedSavePostServiceServer() {}
+func (UnimplementedSavePostServiceServer) testEmbeddedByValue()                         {}
 
-// UnsafeSaveTextServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SaveTextServiceServer will
+// UnsafeSavePostServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SavePostServiceServer will
 // result in compilation errors.
-type UnsafeSaveTextServiceServer interface {
-	mustEmbedUnimplementedSaveTextServiceServer()
+type UnsafeSavePostServiceServer interface {
+	mustEmbedUnimplementedSavePostServiceServer()
 }
 
-func RegisterSaveTextServiceServer(s grpc.ServiceRegistrar, srv SaveTextServiceServer) {
-	// If the following call pancis, it indicates UnimplementedSaveTextServiceServer was
+func RegisterSavePostServiceServer(s grpc.ServiceRegistrar, srv SavePostServiceServer) {
+	// If the following call pancis, it indicates UnimplementedSavePostServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&SaveTextService_ServiceDesc, srv)
+	s.RegisterService(&SavePostService_ServiceDesc, srv)
 }
 
-func _SaveTextService_SaveGeneratedText_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SaveRequest)
+func _SavePostService_SavePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SavePostRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SaveTextServiceServer).SaveGeneratedText(ctx, in)
+		return srv.(SavePostServiceServer).SavePost(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SaveTextService_SaveGeneratedText_FullMethodName,
+		FullMethod: SavePostService_SavePost_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SaveTextServiceServer).SaveGeneratedText(ctx, req.(*SaveRequest))
+		return srv.(SavePostServiceServer).SavePost(ctx, req.(*SavePostRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// SaveTextService_ServiceDesc is the grpc.ServiceDesc for SaveTextService service.
+// SavePostService_ServiceDesc is the grpc.ServiceDesc for SavePostService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var SaveTextService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.SaveTextService",
-	HandlerType: (*SaveTextServiceServer)(nil),
+var SavePostService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.SavePostService",
+	HandlerType: (*SavePostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SaveGeneratedText",
-			Handler:    _SaveTextService_SaveGeneratedText_Handler,
+			MethodName: "SavePost",
+			Handler:    _SavePostService_SavePost_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "service.proto",
+}
+
+const (
+	GetPostService_GetPost_FullMethodName = "/proto.GetPostService/GetPost"
+)
+
+// GetPostServiceClient is the client API for GetPostService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// Сервис для получения поста
+type GetPostServiceClient interface {
+	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
+}
+
+type getPostServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGetPostServiceClient(cc grpc.ClientConnInterface) GetPostServiceClient {
+	return &getPostServiceClient{cc}
+}
+
+func (c *getPostServiceClient) GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPostResponse)
+	err := c.cc.Invoke(ctx, GetPostService_GetPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetPostServiceServer is the server API for GetPostService service.
+// All implementations must embed UnimplementedGetPostServiceServer
+// for forward compatibility.
+//
+// Сервис для получения поста
+type GetPostServiceServer interface {
+	GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
+	mustEmbedUnimplementedGetPostServiceServer()
+}
+
+// UnimplementedGetPostServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedGetPostServiceServer struct{}
+
+func (UnimplementedGetPostServiceServer) GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPost not implemented")
+}
+func (UnimplementedGetPostServiceServer) mustEmbedUnimplementedGetPostServiceServer() {}
+func (UnimplementedGetPostServiceServer) testEmbeddedByValue()                        {}
+
+// UnsafeGetPostServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GetPostServiceServer will
+// result in compilation errors.
+type UnsafeGetPostServiceServer interface {
+	mustEmbedUnimplementedGetPostServiceServer()
+}
+
+func RegisterGetPostServiceServer(s grpc.ServiceRegistrar, srv GetPostServiceServer) {
+	// If the following call pancis, it indicates UnimplementedGetPostServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&GetPostService_ServiceDesc, srv)
+}
+
+func _GetPostService_GetPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GetPostServiceServer).GetPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GetPostService_GetPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GetPostServiceServer).GetPost(ctx, req.(*GetPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GetPostService_ServiceDesc is the grpc.ServiceDesc for GetPostService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var GetPostService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.GetPostService",
+	HandlerType: (*GetPostServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetPost",
+			Handler:    _GetPostService_GetPost_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "service.proto",
+}
+
+const (
+	SaveCommentService_SaveComment_FullMethodName = "/proto.SaveCommentService/SaveComment"
+)
+
+// SaveCommentServiceClient is the client API for SaveCommentService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// Сервис для сохранения сгенерированного текста в Коммент
+type SaveCommentServiceClient interface {
+	SaveComment(ctx context.Context, in *SaveCommentRequest, opts ...grpc.CallOption) (*SaveCommentResponse, error)
+}
+
+type saveCommentServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSaveCommentServiceClient(cc grpc.ClientConnInterface) SaveCommentServiceClient {
+	return &saveCommentServiceClient{cc}
+}
+
+func (c *saveCommentServiceClient) SaveComment(ctx context.Context, in *SaveCommentRequest, opts ...grpc.CallOption) (*SaveCommentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SaveCommentResponse)
+	err := c.cc.Invoke(ctx, SaveCommentService_SaveComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SaveCommentServiceServer is the server API for SaveCommentService service.
+// All implementations must embed UnimplementedSaveCommentServiceServer
+// for forward compatibility.
+//
+// Сервис для сохранения сгенерированного текста в Коммент
+type SaveCommentServiceServer interface {
+	SaveComment(context.Context, *SaveCommentRequest) (*SaveCommentResponse, error)
+	mustEmbedUnimplementedSaveCommentServiceServer()
+}
+
+// UnimplementedSaveCommentServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedSaveCommentServiceServer struct{}
+
+func (UnimplementedSaveCommentServiceServer) SaveComment(context.Context, *SaveCommentRequest) (*SaveCommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveComment not implemented")
+}
+func (UnimplementedSaveCommentServiceServer) mustEmbedUnimplementedSaveCommentServiceServer() {}
+func (UnimplementedSaveCommentServiceServer) testEmbeddedByValue()                            {}
+
+// UnsafeSaveCommentServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SaveCommentServiceServer will
+// result in compilation errors.
+type UnsafeSaveCommentServiceServer interface {
+	mustEmbedUnimplementedSaveCommentServiceServer()
+}
+
+func RegisterSaveCommentServiceServer(s grpc.ServiceRegistrar, srv SaveCommentServiceServer) {
+	// If the following call pancis, it indicates UnimplementedSaveCommentServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&SaveCommentService_ServiceDesc, srv)
+}
+
+func _SaveCommentService_SaveComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SaveCommentServiceServer).SaveComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SaveCommentService_SaveComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SaveCommentServiceServer).SaveComment(ctx, req.(*SaveCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SaveCommentService_ServiceDesc is the grpc.ServiceDesc for SaveCommentService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SaveCommentService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.SaveCommentService",
+	HandlerType: (*SaveCommentServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SaveComment",
+			Handler:    _SaveCommentService_SaveComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

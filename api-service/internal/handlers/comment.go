@@ -108,7 +108,7 @@ func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	offset := (request.Pagination.PageIndex - 1) * request.Pagination.RecordsPerPage
-	comments, err := comment.GetList(offset, request.Pagination.RecordsPerPage)
+	comments, err := comment.GetList(request.PostID, offset, request.Pagination.RecordsPerPage)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to retrieve comments"}`, http.StatusInternalServerError)
 		return

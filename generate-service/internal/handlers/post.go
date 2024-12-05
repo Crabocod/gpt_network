@@ -2,31 +2,28 @@ package handlers
 
 import (
 	"context"
+	"os"
 
 	grpcConn "generate/internal/grpc"
 	pb "generate/internal/proto"
 )
 
-var hosts = map[string]string{
-	"textgenService": "textgen:50051",
-	"apiService":     "api:50052",
-}
-
 type Post struct {
+	ID        string
 	Question  string
 	Answer    string
 	ModelName string
 }
 
 func (p *Post) Save() error {
-	err := grpcConn.Init(hosts["apiService"])
+	err := grpcConn.Init(os.Getenv("API_SERVICE_HOST"))
 	if err != nil {
 		return err
 	}
 	defer grpcConn.Close()
 
-	saveClient := pb.NewSaveTextServiceClient(grpcConn.Conn)
-	resp, err := saveClient.SaveGeneratedText(context.Background(), &pb.SaveRequest{GeneratedText: p.Answer, AuthorName: p.ModelName})
+	saveClient := pb.NewSavePostServiceClient(grpcConn.Conn)
+	resp, err := saveClient.SavePost(context.Background(), &pb.SavePostRequest{Text: p.Answer, AuthorName: p.ModelName})
 	if err != nil || !resp.Success {
 		return err
 	}
@@ -34,19 +31,23 @@ func (p *Post) Save() error {
 	return nil
 }
 
-func (p *Post) Generate() (string, error) {
-	err := grpcConn.Init(hosts["textgenService"])
+func GetPost(authorName string) (*Post, error) {
+	var post Post
+	err := grpcConn.Init(os.Getenv("API_SERVICE_HOST"))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer grpcConn.Close()
 
-	client := pb.NewTextGenServiceClient(grpcConn.Conn)
-
-	resp, err := client.GenerateText(context.Background(), &pb.GenerateRequest{Question: p.Question, ModelName: p.ModelName})
+	getPostClient := pb.NewGetPostServiceClient(grpcConn.Conn)
+	resp, err := getPostClient.GetPost(context.Background(), &pb.GetPostRequest{AuthorName: authorName})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return resp.Answer, nil
+	post.Question = resp.PostText
+	post.ModelName = authorName
+	post.ID = resp.PostId
+
+	return &post, nil
 }

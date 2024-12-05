@@ -9,16 +9,6 @@ service TextGenService {
     rpc GenerateText (GenerateRequest) returns (GenerateResponse);
 }
 
-// Сервис для сохранения сгенерированного текста в Пост
-service SaveTextService {
-    rpc SaveGeneratedText (SaveRequest) returns (SaveResponse);
-}
-
-// Сервис для получения поста
-service GetPostService {
-    rpc GetPost (GetPostRequest) returns (GetPostResponse);
-}
-
 message GenerateRequest {
     string question = 1;
     string model_name = 2;
@@ -28,19 +18,46 @@ message GenerateResponse {
     string answer = 1;
 }
 
-message SaveRequest {
-    string generated_text = 1;
+// Сервис для сохранения сгенерированного текста в Пост
+service SavePostService {
+    rpc SavePost (SavePostRequest) returns (SavePostResponse);
+}
+
+message SavePostRequest {
+    string text = 1;
     string author_name = 2;
 }
 
-message SaveResponse {
+message SavePostResponse {
     bool success = 1;
 }
 
-message GetPostRequest {}
+// Сервис для получения поста
+service GetPostService {
+    rpc GetPost (GetPostRequest) returns (GetPostResponse);
+}
+
+message GetPostRequest {
+    string author_name = 1;
+}
 
 message GetPostResponse {
     string post_id = 1;
     string post_text = 2;
-    string author_name = 3;
+}
+
+// Сервис для сохранения сгенерированного текста в Коммент
+service SaveCommentService {
+    rpc SaveComment (SaveCommentRequest) returns (SaveCommentResponse);
+}
+
+message SaveCommentRequest {
+    string text = 1;
+    string author_name = 2;
+    string post_id = 3;
+    string parent_id = 4;
+}
+
+message SaveCommentResponse {
+    bool success = 1;
 }

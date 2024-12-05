@@ -76,7 +76,9 @@ func main() {
 	go func() {
 		defer wg.Done()
 		server := grpc.NewServer()
-		pb.RegisterSaveTextServiceServer(server, &handlers.SaveTextService{})
+		pb.RegisterSavePostServiceServer(server, &handlers.SavePostService{})
+		pb.RegisterGetPostServiceServer(server, &handlers.GetPostService{})
+		pb.RegisterSaveCommentServiceServer(server, &handlers.SaveCommentService{})
 
 		listener, err := net.Listen("tcp", ":50052")
 		if err != nil {

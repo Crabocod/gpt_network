@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x05proto\"7\n\x0fGenerateRequest\x12\x10\n\x08question\x18\x01 \x01(\t\x12\x12\n\nmodel_name\x18\x02 \x01(\t\"\"\n\x10GenerateResponse\x12\x0e\n\x06\x61nswer\x18\x01 \x01(\t\":\n\x0bSaveRequest\x12\x16\n\x0egenerated_text\x18\x01 \x01(\t\x12\x13\n\x0b\x61uthor_name\x18\x02 \x01(\t\"\x1f\n\x0cSaveResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32Q\n\x0eTextGenService\x12?\n\x0cGenerateText\x12\x16.proto.GenerateRequest\x1a\x17.proto.GenerateResponse2O\n\x0fSaveTextService\x12<\n\x11SaveGeneratedText\x12\x12.proto.SaveRequest\x1a\x13.proto.SaveResponseB\x0cZ\n./go/protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x05proto\"7\n\x0fGenerateRequest\x12\x10\n\x08question\x18\x01 \x01(\t\x12\x12\n\nmodel_name\x18\x02 \x01(\t\"\"\n\x10GenerateResponse\x12\x0e\n\x06\x61nswer\x18\x01 \x01(\t\"4\n\x0fSavePostRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x13\n\x0b\x61uthor_name\x18\x02 \x01(\t\"#\n\x10SavePostResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"%\n\x0eGetPostRequest\x12\x13\n\x0b\x61uthor_name\x18\x01 \x01(\t\"5\n\x0fGetPostResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x11\n\tpost_text\x18\x02 \x01(\t\"[\n\x12SaveCommentRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x13\n\x0b\x61uthor_name\x18\x02 \x01(\t\x12\x0f\n\x07post_id\x18\x03 \x01(\t\x12\x11\n\tparent_id\x18\x04 \x01(\t\"&\n\x13SaveCommentResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32Q\n\x0eTextGenService\x12?\n\x0cGenerateText\x12\x16.proto.GenerateRequest\x1a\x17.proto.GenerateResponse2N\n\x0fSavePostService\x12;\n\x08SavePost\x12\x16.proto.SavePostRequest\x1a\x17.proto.SavePostResponse2J\n\x0eGetPostService\x12\x38\n\x07GetPost\x12\x15.proto.GetPostRequest\x1a\x16.proto.GetPostResponse2Z\n\x12SaveCommentService\x12\x44\n\x0bSaveComment\x12\x19.proto.SaveCommentRequest\x1a\x1a.proto.SaveCommentResponseB\x0cZ\n./go/protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,12 +36,24 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_GENERATEREQUEST']._serialized_end=79
   _globals['_GENERATERESPONSE']._serialized_start=81
   _globals['_GENERATERESPONSE']._serialized_end=115
-  _globals['_SAVEREQUEST']._serialized_start=117
-  _globals['_SAVEREQUEST']._serialized_end=175
-  _globals['_SAVERESPONSE']._serialized_start=177
-  _globals['_SAVERESPONSE']._serialized_end=208
-  _globals['_TEXTGENSERVICE']._serialized_start=210
-  _globals['_TEXTGENSERVICE']._serialized_end=291
-  _globals['_SAVETEXTSERVICE']._serialized_start=293
-  _globals['_SAVETEXTSERVICE']._serialized_end=372
+  _globals['_SAVEPOSTREQUEST']._serialized_start=117
+  _globals['_SAVEPOSTREQUEST']._serialized_end=169
+  _globals['_SAVEPOSTRESPONSE']._serialized_start=171
+  _globals['_SAVEPOSTRESPONSE']._serialized_end=206
+  _globals['_GETPOSTREQUEST']._serialized_start=208
+  _globals['_GETPOSTREQUEST']._serialized_end=245
+  _globals['_GETPOSTRESPONSE']._serialized_start=247
+  _globals['_GETPOSTRESPONSE']._serialized_end=300
+  _globals['_SAVECOMMENTREQUEST']._serialized_start=302
+  _globals['_SAVECOMMENTREQUEST']._serialized_end=393
+  _globals['_SAVECOMMENTRESPONSE']._serialized_start=395
+  _globals['_SAVECOMMENTRESPONSE']._serialized_end=433
+  _globals['_TEXTGENSERVICE']._serialized_start=435
+  _globals['_TEXTGENSERVICE']._serialized_end=516
+  _globals['_SAVEPOSTSERVICE']._serialized_start=518
+  _globals['_SAVEPOSTSERVICE']._serialized_end=596
+  _globals['_GETPOSTSERVICE']._serialized_start=598
+  _globals['_GETPOSTSERVICE']._serialized_end=672
+  _globals['_SAVECOMMENTSERVICE']._serialized_start=674
+  _globals['_SAVECOMMENTSERVICE']._serialized_end=764
 # @@protoc_insertion_point(module_scope)

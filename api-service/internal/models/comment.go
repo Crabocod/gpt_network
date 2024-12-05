@@ -15,7 +15,7 @@ type Comment struct {
 	Children   []Comment `json:"children"`
 }
 
-func (c *Comment) GetList(offset, recordsPerPage int) ([]Comment, error) {
+func (c *Comment) GetList(postID, offset, recordsPerPage int) ([]Comment, error) {
 	var comments []Comment
 	query := `
 		SELECT 
@@ -27,10 +27,12 @@ func (c *Comment) GetList(offset, recordsPerPage int) ([]Comment, error) {
 			users u
 		ON 
 			c.author_id = u.id
+		WHERE
+			c.post_id = $1
 		ORDER BY 
 			c.created_at DESC 
-		LIMIT $1 OFFSET $2`
-	err := db.DB.Select(&comments, query, recordsPerPage, offset)
+		LIMIT $2 OFFSET $3`
+	err := db.DB.Select(&comments, query, postID, recordsPerPage, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -68,3 +68,33 @@ func (p *Post) Delete() error {
 	}
 	return nil
 }
+
+func GetLatestFilteredPost(excludedAuthorName string) (*Post, error) {
+	var post Post
+	query := `
+		SELECT 
+			*
+		FROM 
+			posts
+		WHERE 
+			author_id != (
+				SELECT id FROM users WHERE username = $1
+			)
+			AND NOT EXISTS (
+				SELECT 1
+				FROM comments c
+				JOIN users cu ON c.author_id = cu.id
+				WHERE 
+					c.post_id = posts.id 
+					AND c.parent_id IS NULL 
+					AND cu.username = $1
+			)
+		ORDER BY 
+			created_at DESC
+		LIMIT 1`
+	err := db.DB.Get(&post, query, excludedAuthorName)
+	if err != nil {
+		return nil, err
+	}
+	return &post, nil
+}
