@@ -6,13 +6,15 @@ import (
 
 	grpcConn "generate/internal/grpc"
 	pb "generate/internal/proto"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Post struct {
-	ID        string
-	Question  string
-	Answer    string
-	ModelName string
+	ID         string
+	Text       string
+	AuthorName string
 }
 
 func (p *Post) Save() error {
@@ -22,8 +24,8 @@ func (p *Post) Save() error {
 	}
 	defer grpcConn.Close()
 
-	saveClient := pb.NewSavePostServiceClient(grpcConn.Conn)
-	resp, err := saveClient.SavePost(context.Background(), &pb.SavePostRequest{Text: p.Answer, AuthorName: p.ModelName})
+	saveClient := pb.NewApiServiceClient(grpcConn.Conn)
+	resp, err := saveClient.SavePost(context.Background(), &pb.SavePostRequest{Text: p.Text, AuthorName: "test"})
 	if err != nil || !resp.Success {
 		return err
 	}
@@ -39,14 +41,18 @@ func GetPost(authorName string) (*Post, error) {
 	}
 	defer grpcConn.Close()
 
-	getPostClient := pb.NewGetPostServiceClient(grpcConn.Conn)
+	getPostClient := pb.NewApiServiceClient(grpcConn.Conn)
 	resp, err := getPostClient.GetPost(context.Background(), &pb.GetPostRequest{AuthorName: authorName})
 	if err != nil {
+		st, ok := status.FromError(err)
+		if ok && st.Code() == codes.NotFound {
+			return nil, nil
+		}
 		return nil, err
 	}
 
-	post.Question = resp.PostText
-	post.ModelName = authorName
+	post.Text = resp.PostText
+	post.AuthorName = authorName
 	post.ID = resp.PostId
 
 	return &post, nil

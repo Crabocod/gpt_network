@@ -9,26 +9,26 @@ import (
 )
 
 type Comment struct {
-	ID        int
-	Question  string
-	Answer    string
-	ModelName string
+	ID         string
+	PostID     string
+	Text       string
+	AuthorName string
 }
 
-func (p *Comment) Save(post *Post) error {
+func (c *Comment) Save() error {
 	err := grpcConn.Init(os.Getenv("API_SERVICE_HOST"))
 	if err != nil {
 		return err
 	}
 	defer grpcConn.Close()
 
-	saveClient := pb.NewSaveCommentServiceClient(grpcConn.Conn)
+	saveClient := pb.NewApiServiceClient(grpcConn.Conn)
 
 	resp, err := saveClient.SaveComment(context.Background(),
 		&pb.SaveCommentRequest{
-			Text:       post.Answer,
-			AuthorName: post.ModelName,
-			PostId:     post.ID,
+			Text:       c.Text,
+			AuthorName: c.AuthorName,
+			PostId:     c.PostID,
 		})
 
 	if err != nil || !resp.Success {

@@ -5,7 +5,7 @@ import warnings
 
 import service_pb2 as service__pb2
 
-GRPC_GENERATED_VERSION = '1.68.0'
+GRPC_GENERATED_VERSION = '1.68.1'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -100,8 +100,8 @@ class TextGenService(object):
             _registered_method=True)
 
 
-class SavePostServiceStub(object):
-    """Сервис для сохранения сгенерированного текста в Пост
+class ApiServiceStub(object):
+    """Сервис для общения с API
     """
 
     def __init__(self, channel):
@@ -111,14 +111,24 @@ class SavePostServiceStub(object):
             channel: A grpc.Channel.
         """
         self.SavePost = channel.unary_unary(
-                '/proto.SavePostService/SavePost',
+                '/proto.ApiService/SavePost',
                 request_serializer=service__pb2.SavePostRequest.SerializeToString,
                 response_deserializer=service__pb2.SavePostResponse.FromString,
                 _registered_method=True)
+        self.SaveComment = channel.unary_unary(
+                '/proto.ApiService/SaveComment',
+                request_serializer=service__pb2.SaveCommentRequest.SerializeToString,
+                response_deserializer=service__pb2.SaveCommentResponse.FromString,
+                _registered_method=True)
+        self.GetPost = channel.unary_unary(
+                '/proto.ApiService/GetPost',
+                request_serializer=service__pb2.GetPostRequest.SerializeToString,
+                response_deserializer=service__pb2.GetPostResponse.FromString,
+                _registered_method=True)
 
 
-class SavePostServiceServicer(object):
-    """Сервис для сохранения сгенерированного текста в Пост
+class ApiServiceServicer(object):
+    """Сервис для общения с API
     """
 
     def SavePost(self, request, context):
@@ -127,24 +137,46 @@ class SavePostServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SaveComment(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-def add_SavePostServiceServicer_to_server(servicer, server):
+    def GetPost(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_ApiServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SavePost': grpc.unary_unary_rpc_method_handler(
                     servicer.SavePost,
                     request_deserializer=service__pb2.SavePostRequest.FromString,
                     response_serializer=service__pb2.SavePostResponse.SerializeToString,
             ),
+            'SaveComment': grpc.unary_unary_rpc_method_handler(
+                    servicer.SaveComment,
+                    request_deserializer=service__pb2.SaveCommentRequest.FromString,
+                    response_serializer=service__pb2.SaveCommentResponse.SerializeToString,
+            ),
+            'GetPost': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPost,
+                    request_deserializer=service__pb2.GetPostRequest.FromString,
+                    response_serializer=service__pb2.GetPostResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'proto.SavePostService', rpc_method_handlers)
+            'proto.ApiService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('proto.SavePostService', rpc_method_handlers)
+    server.add_registered_method_handlers('proto.ApiService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class SavePostService(object):
-    """Сервис для сохранения сгенерированного текста в Пост
+class ApiService(object):
+    """Сервис для общения с API
     """
 
     @staticmethod
@@ -161,7 +193,7 @@ class SavePostService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SavePostService/SavePost',
+            '/proto.ApiService/SavePost',
             service__pb2.SavePostRequest.SerializeToString,
             service__pb2.SavePostResponse.FromString,
             options,
@@ -173,129 +205,6 @@ class SavePostService(object):
             timeout,
             metadata,
             _registered_method=True)
-
-
-class GetPostServiceStub(object):
-    """Сервис для получения поста
-    """
-
-    def __init__(self, channel):
-        """Constructor.
-
-        Args:
-            channel: A grpc.Channel.
-        """
-        self.GetPost = channel.unary_unary(
-                '/proto.GetPostService/GetPost',
-                request_serializer=service__pb2.GetPostRequest.SerializeToString,
-                response_deserializer=service__pb2.GetPostResponse.FromString,
-                _registered_method=True)
-
-
-class GetPostServiceServicer(object):
-    """Сервис для получения поста
-    """
-
-    def GetPost(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-
-def add_GetPostServiceServicer_to_server(servicer, server):
-    rpc_method_handlers = {
-            'GetPost': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetPost,
-                    request_deserializer=service__pb2.GetPostRequest.FromString,
-                    response_serializer=service__pb2.GetPostResponse.SerializeToString,
-            ),
-    }
-    generic_handler = grpc.method_handlers_generic_handler(
-            'proto.GetPostService', rpc_method_handlers)
-    server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('proto.GetPostService', rpc_method_handlers)
-
-
- # This class is part of an EXPERIMENTAL API.
-class GetPostService(object):
-    """Сервис для получения поста
-    """
-
-    @staticmethod
-    def GetPost(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/proto.GetPostService/GetPost',
-            service__pb2.GetPostRequest.SerializeToString,
-            service__pb2.GetPostResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-
-class SaveCommentServiceStub(object):
-    """Сервис для сохранения сгенерированного текста в Коммент
-    """
-
-    def __init__(self, channel):
-        """Constructor.
-
-        Args:
-            channel: A grpc.Channel.
-        """
-        self.SaveComment = channel.unary_unary(
-                '/proto.SaveCommentService/SaveComment',
-                request_serializer=service__pb2.SaveCommentRequest.SerializeToString,
-                response_deserializer=service__pb2.SaveCommentResponse.FromString,
-                _registered_method=True)
-
-
-class SaveCommentServiceServicer(object):
-    """Сервис для сохранения сгенерированного текста в Коммент
-    """
-
-    def SaveComment(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-
-def add_SaveCommentServiceServicer_to_server(servicer, server):
-    rpc_method_handlers = {
-            'SaveComment': grpc.unary_unary_rpc_method_handler(
-                    servicer.SaveComment,
-                    request_deserializer=service__pb2.SaveCommentRequest.FromString,
-                    response_serializer=service__pb2.SaveCommentResponse.SerializeToString,
-            ),
-    }
-    generic_handler = grpc.method_handlers_generic_handler(
-            'proto.SaveCommentService', rpc_method_handlers)
-    server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('proto.SaveCommentService', rpc_method_handlers)
-
-
- # This class is part of an EXPERIMENTAL API.
-class SaveCommentService(object):
-    """Сервис для сохранения сгенерированного текста в Коммент
-    """
 
     @staticmethod
     def SaveComment(request,
@@ -311,9 +220,36 @@ class SaveCommentService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SaveCommentService/SaveComment',
+            '/proto.ApiService/SaveComment',
             service__pb2.SaveCommentRequest.SerializeToString,
             service__pb2.SaveCommentResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetPost(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.ApiService/GetPost',
+            service__pb2.GetPostRequest.SerializeToString,
+            service__pb2.GetPostResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -2,26 +2,23 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"log"
 	"strconv"
 
 	"web.app/internal/models"
 	pb "web.app/internal/proto"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-type SavePostService struct {
-	pb.UnimplementedSavePostServiceServer
+type ApiService struct {
+	pb.UnimplementedApiServiceServer
 }
 
-type GetPostService struct {
-	pb.UnimplementedGetPostServiceServer
-}
-
-type SaveCommentService struct {
-	pb.UnimplementedSaveCommentServiceServer
-}
-
-func (s *SaveCommentService) SaveComment(ctx context.Context, req *pb.SaveCommentRequest) (*pb.SaveCommentResponse, error) {
+func (s *ApiService) SaveComment(ctx context.Context, req *pb.SaveCommentRequest) (*pb.SaveCommentResponse, error) {
 	var comment models.Comment
 
 	User, err := models.GetUserByName(req.GetAuthorName())
@@ -42,12 +39,13 @@ func (s *SaveCommentService) SaveComment(ctx context.Context, req *pb.SaveCommen
 	return &pb.SaveCommentResponse{Success: true}, nil
 }
 
-func (s *GetPostService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.GetPostResponse, error) {
-
+func (s *ApiService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.GetPostResponse, error) {
 	Post, err := models.GetLatestFilteredPost(req.GetAuthorName())
 	if err != nil {
-		log.Printf("Ошибка при получении поста: %v", err)
-		return &pb.GetPostResponse{}, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "Post not found for author: %s", req.GetAuthorName())
+		}
+		return nil, status.Errorf(codes.Internal, "Error retrieving post: %v", err)
 	}
 
 	return &pb.GetPostResponse{
@@ -56,7 +54,7 @@ func (s *GetPostService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*
 	}, nil
 }
 
-func (s *SavePostService) SavePost(ctx context.Context, req *pb.SavePostRequest) (*pb.SavePostResponse, error) {
+func (s *ApiService) SavePost(ctx context.Context, req *pb.SavePostRequest) (*pb.SavePostResponse, error) {
 	var post models.Post
 
 	User, err := models.GetUserByName(req.GetAuthorName())

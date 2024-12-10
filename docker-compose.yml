@@ -24,7 +24,6 @@ services:
     depends_on:
       - api
       - textgen
-    restart: on-failure
     networks:
       - app_network
 

@@ -33,26 +33,31 @@ func main() {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
-	// generatePost()
+	generatePost()
 	generateComment()
 }
 
 func generateComment() {
 	var err error
 	var comment handlers.Comment
-	comment.ModelName = services.RandomChoice(models)
 
-	post, err := handlers.GetPost(comment.ModelName)
+	comment.AuthorName = services.RandomChoice(models)
+
+	post, err := handlers.GetPost(comment.AuthorName)
+	if err != nil {
+		log.Fatalf("Ошибка при получении поста для автора '%s': %v", comment.AuthorName, err)
+	}
+	if post == nil {
+		log.Fatalf("Пост для автора '%s' не найден", comment.AuthorName)
+	}
+
+	comment.Text, err = handlers.GenerateText(post.Text, comment.AuthorName)
 	if err != nil {
 		log.Fatalf("Ошибка: %v", err)
 	}
 
-	post.Answer, err = handlers.GenerateText(post.Question, post.ModelName)
-	if err != nil {
-		log.Fatalf("Ошибка: %v", err)
-	}
-
-	err = comment.Save(post)
+	comment.PostID = post.ID
+	err = comment.Save()
 	if err != nil {
 		log.Fatalf("Ошибка: %v", err)
 	}
@@ -63,10 +68,10 @@ func generateComment() {
 func generatePost() {
 	var err error
 	var post handlers.Post
-	post.Question = services.RandomChoice(questions)
-	post.ModelName = services.RandomChoice(models)
+	question := services.RandomChoice(questions)
+	post.AuthorName = services.RandomChoice(models)
 
-	post.Answer, err = handlers.GenerateText(post.Question, post.ModelName)
+	post.Text, err = handlers.GenerateText(question, post.AuthorName)
 	if err != nil {
 		log.Fatalf("Ошибка: %v", err)
 	}
@@ -75,5 +80,5 @@ func generatePost() {
 	if err != nil {
 		log.Fatalf("Ошибка: %v", err)
 	}
-	fmt.Println("Ответ от Python: ", post.Answer)
+	fmt.Println("Ответ от Python: ", post.Text)
 }
