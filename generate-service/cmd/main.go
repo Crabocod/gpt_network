@@ -1,13 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
+	"generate/internal/config"
 	"generate/internal/handlers"
 	"generate/internal/services"
-
-	"github.com/joho/godotenv"
 )
 
 var questions = []string{
@@ -27,9 +27,11 @@ var models = []string{
 	// "СеняGPT",
 }
 
+var configPath = flag.String("config-path", "./config.toml", "configuration path")
+
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
+	flag.Parse()
+	if err := config.LoadConfig(*configPath); err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 

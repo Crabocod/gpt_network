@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -19,15 +20,16 @@ import (
 	"google.golang.org/grpc"
 )
 
+var configPath = flag.String("config-path", "./config.toml", "configuration path")
+
 func main() {
-	// Загрузка конфигурации
-	err := config.LoadConfig()
-	if err != nil {
+	flag.Parse()
+	if err := config.LoadConfig(*configPath); err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
 	// Подключение к базе данных
-	err = db.Connect()
+	err := db.Connect()
 	if err != nil {
 		log.Fatalf("Ошибка подключения к базе данных: %v", err)
 	}

@@ -15,6 +15,6 @@ WORKDIR /root
 
 # Копируем скомпилированное приложение и все необходимые файлы
 COPY --from=builder /go/src/app/app .
-COPY .env .
+COPY config.toml .
 
 CMD ["./app"]

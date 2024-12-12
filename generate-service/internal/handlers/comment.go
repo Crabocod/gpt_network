@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"os"
 
+	"generate/internal/config"
 	grpcConn "generate/internal/grpc"
 	pb "generate/internal/proto"
 )
@@ -16,7 +16,7 @@ type Comment struct {
 }
 
 func (c *Comment) Save() error {
-	err := grpcConn.Init(os.Getenv("API_SERVICE_HOST"))
+	err := grpcConn.Init(config.Data.ApiServiceHost)
 	if err != nil {
 		return err
 	}

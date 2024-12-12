@@ -1,14 +1,14 @@
 package services
 
 import (
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"web.app/internal/config"
 )
 
-var JWTSecret = []byte(os.Getenv("JWT_ACCESS_SECRET"))
-var RefreshSecret = []byte(os.Getenv("JWT_REFRESH_SECRET"))
+var JWTSecret = []byte(config.Data.JWT.AccessSecret)
+var RefreshSecret = []byte(config.Data.JWT.RefreshSecret)
 
 type JWTClaims struct {
 	UserID int `json:"user_id"`

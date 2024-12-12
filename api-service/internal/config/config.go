@@ -1,15 +1,27 @@
 package config
 
-import (
-	"log"
+import "github.com/BurntSushi/toml"
 
-	"github.com/joho/godotenv"
-)
+type Config struct {
+	Database struct {
+		Host     string `toml:"DB_HOST"`
+		Port     string `toml:"DB_PORT"`
+		User     string `toml:"DB_USER"`
+		Password string `toml:"DB_PASSWORD"`
+		Name     string `toml:"DB_NAME"`
+		SSLMode  string `toml:"DB_SSLMODE"`
+	}
+	JWT struct {
+		AccessSecret  string `toml:"JWT_ACCESS_SECRET"`
+		RefreshSecret string `toml:"JWT_REFRESH_SECRET"`
+	}
+}
 
-func LoadConfig() error {
-	err := godotenv.Load(".env")
+var Data Config
+
+func LoadConfig(path string) error {
+	_, err := toml.DecodeFile(path, &Data)
 	if err != nil {
-		log.Fatalf("Ошибка загрузки .env файла")
 		return err
 	}
 	return nil

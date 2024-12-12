@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"context"
-	"os"
 
+	"generate/internal/config"
 	grpcConn "generate/internal/grpc"
 	pb "generate/internal/proto"
 )
 
 func GenerateText(question, modelName string) (string, error) {
-	err := grpcConn.Init(os.Getenv("TEXTGEN_SERVICE_HOST"))
+	err := grpcConn.Init(config.Data.TextgenServiceHost)
 	if err != nil {
 		return "", err
 	}

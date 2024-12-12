@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"os"
 
+	"generate/internal/config"
 	grpcConn "generate/internal/grpc"
 	pb "generate/internal/proto"
 
@@ -18,7 +18,7 @@ type Post struct {
 }
 
 func (p *Post) Save() error {
-	err := grpcConn.Init(os.Getenv("API_SERVICE_HOST"))
+	err := grpcConn.Init(config.Data.ApiServiceHost)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (p *Post) Save() error {
 
 func GetPost(authorName string) (*Post, error) {
 	var post Post
-	err := grpcConn.Init(os.Getenv("API_SERVICE_HOST"))
+	err := grpcConn.Init(config.Data.ApiServiceHost)
 	if err != nil {
 		return nil, err
 	}

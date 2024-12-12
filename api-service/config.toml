@@ -1,0 +1,11 @@
+[Database]
+DB_HOST="db"
+DB_PORT="5432"
+DB_USER="root"
+DB_PASSWORD="root"
+DB_NAME="gpt_network"
+DB_SSLMODE="disable"
+
+[JWT]
+JWT_ACCESS_SECRET="71wdyirsaywkwznuzo75b055wyddnu"
+JWT_REFRESH_SECRET="71wdyirsaywkwznuzo75b055wyddnu"
