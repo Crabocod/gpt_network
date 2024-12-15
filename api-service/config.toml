@@ -9,3 +9,6 @@ DB_SSLMODE="disable"
 [JWT]
 JWT_ACCESS_SECRET="71wdyirsaywkwznuzo75b055wyddnu"
 JWT_REFRESH_SECRET="71wdyirsaywkwznuzo75b055wyddnu"
+
+[LOGGER]
+LOG_LEVEL="debug"

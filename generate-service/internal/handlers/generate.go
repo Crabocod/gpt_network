@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateText(question, modelName string) (string, error) {
-	err := grpcConn.Init(config.Data.TextgenServiceHost)
+	err := grpcConn.Init(config.Data.Hosts.TextgenService)
 	if err != nil {
 		return "", err
 	}

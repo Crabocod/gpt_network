@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"web.app/internal/config"
 	"web.app/internal/db"
 	"web.app/internal/handlers"
+	logger "web.app/internal/logger"
 	"web.app/internal/middlewares"
 	pb "web.app/internal/proto"
 
@@ -25,16 +25,18 @@ var configPath = flag.String("config-path", "./config.toml", "configuration path
 func main() {
 	flag.Parse()
 	if err := config.LoadConfig(*configPath); err != nil {
-		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
+		log.Fatalf("Error loading configuration: %v", err)
 	}
 
-	// Подключение к базе данных
+	if err := logger.LoadLogger(); err != nil {
+		log.Fatalf("Error loading logrus: %v", err)
+	}
+
 	err := db.Connect()
 	if err != nil {
-		log.Fatalf("Ошибка подключения к базе данных: %v", err)
+		logger.Logrus.Fatalf("Error connecting to database: %v", err)
 	}
 
-	// Настройка маршрутов
 	r := mux.NewRouter()
 	r.HandleFunc("/auth/registration/", handlers.RegisterHandler).Methods("POST")
 	r.HandleFunc("/auth/login/", handlers.LoginHandler).Methods("POST")
@@ -69,9 +71,9 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		fmt.Println("Starting HTTP server on :85...")
+		logger.Logrus.Info("Starting HTTP server on :85...")
 		if err := http.ListenAndServe(":85", handlerWithCORS); err != nil {
-			log.Fatalf("HTTP server failed to start: %v", err)
+			logger.Logrus.Fatalf("HTTP server failed to start: %v", err)
 		}
 	}()
 
@@ -82,12 +84,12 @@ func main() {
 
 		listener, err := net.Listen("tcp", ":50052")
 		if err != nil {
-			log.Fatalf("Ошибка при запуске gRPC-сервера: %v", err)
+			logger.Logrus.Fatalf("Error starting gRPC listener: %v", err)
 		}
 
-		log.Println("gRPC-сервис запущен на порту 50052")
+		logger.Logrus.Info("Starting gRPC server on 50052...")
 		if err := server.Serve(listener); err != nil {
-			log.Fatalf("gRPC-сервер завершился с ошибкой: %v", err)
+			logger.Logrus.Fatalf("Error starting gRPC server: %v", err)
 		}
 	}()
 

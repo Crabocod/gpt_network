@@ -1,8 +1,9 @@
 package grpc
 
 import (
-	"log"
 	"time"
+
+	logger "web.app/internal/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -18,14 +19,14 @@ func Init() {
 
 	Conn, err = grpc.Dial("textgen:50051", opts...)
 	if err != nil {
-		log.Fatalf("Не удалось подключиться: %v", err)
+		logger.Logrus.Fatalf("Failed to connect to textgen service: %v", err)
 	}
 
 	for Conn.GetState() != connectivity.Ready {
-		log.Println("Ожидание установления соединения...")
+		logger.Logrus.Info("Waiting for connection to textgen service...")
 		time.Sleep(500 * time.Millisecond)
 	}
-	log.Println("gRPC соединение установлено")
+	logger.Logrus.Info("gRPC connection with textgen service established")
 }
 
 func Close() {

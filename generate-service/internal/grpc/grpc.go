@@ -1,8 +1,9 @@
 package grpc
 
 import (
-	"log"
 	"time"
+
+	"generate/internal/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -18,15 +19,15 @@ func Init(host string) error {
 
 	Conn, err = grpc.Dial(host, opts...)
 	if err != nil {
-		log.Fatalf("Не удалось подключиться: %v", err)
+		logger.Logrus.Fatalf("Failed to connect to %s: %v", host, err)
 		return err
 	}
 
 	for Conn.GetState() != connectivity.Ready {
-		log.Println("Ожидание установления соединения...")
+		logger.Logrus.Infof("Waiting for connection to %s...", host)
 		time.Sleep(500 * time.Millisecond)
 	}
-	log.Println("gRPC соединение установлено")
+	logger.Logrus.Infof("gRPC connection with %s established", host)
 
 	return nil
 }

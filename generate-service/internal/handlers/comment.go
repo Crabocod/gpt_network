@@ -16,7 +16,7 @@ type Comment struct {
 }
 
 func (c *Comment) Save() error {
-	err := grpcConn.Init(config.Data.ApiServiceHost)
+	err := grpcConn.Init(config.Data.Hosts.ApiService)
 	if err != nil {
 		return err
 	}

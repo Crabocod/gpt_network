@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -23,7 +22,6 @@ func Connect() error {
 	var err error
 	DB, err = sqlx.Connect("postgres", dbInfo)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
 		return err
 	}
 	return nil

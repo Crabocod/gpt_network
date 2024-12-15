@@ -18,7 +18,7 @@ type Post struct {
 }
 
 func (p *Post) Save() error {
-	err := grpcConn.Init(config.Data.ApiServiceHost)
+	err := grpcConn.Init(config.Data.Hosts.ApiService)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (p *Post) Save() error {
 
 func GetPost(authorName string) (*Post, error) {
 	var post Post
-	err := grpcConn.Init(config.Data.ApiServiceHost)
+	err := grpcConn.Init(config.Data.Hosts.ApiService)
 	if err != nil {
 		return nil, err
 	}

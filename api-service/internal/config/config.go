@@ -15,6 +15,9 @@ type Config struct {
 		AccessSecret  string `toml:"JWT_ACCESS_SECRET"`
 		RefreshSecret string `toml:"JWT_REFRESH_SECRET"`
 	}
+	Logger struct {
+		LogLevel string `toml:"LOG_LEVEL"`
+	}
 }
 
 var Data Config

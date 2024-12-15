@@ -3,8 +3,13 @@ package config
 import "github.com/BurntSushi/toml"
 
 type Config struct {
-	TextgenServiceHost string `toml:"TEXTGEN_SERVICE_HOST"`
-	ApiServiceHost     string `toml:"API_SERVICE_HOST"`
+	Hosts struct {
+		TextgenService string `toml:"TEXTGEN_SERVICE_HOST"`
+		ApiService     string `toml:"API_SERVICE_HOST"`
+	}
+	Logger struct {
+		LogLevel string `toml:"LOG_LEVEL"`
+	}
 }
 
 var Data Config
