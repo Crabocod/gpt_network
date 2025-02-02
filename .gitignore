@@ -1,5 +1,5 @@
 .vscode/
 .idea/
-api-service/internal/db/postgresql_data/
+data/postgresql_data/
 textgen-service/model
 */.DS_Store
