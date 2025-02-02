@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"web.app/internal/models"
+	"github.com/Crabocod/gpt_network/api-service/internal/models"
 
 	"github.com/gorilla/mux"
 )

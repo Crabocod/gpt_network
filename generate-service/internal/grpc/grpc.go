@@ -3,7 +3,7 @@ package grpc
 import (
 	"time"
 
-	"generate/internal/logger"
+	"github.com/Crabocod/gpt_network/generate-service/internal/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"

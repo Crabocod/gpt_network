@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 
-	"generate/internal/config"
-	grpcConn "generate/internal/grpc"
-	pb "generate/internal/proto"
+	"github.com/Crabocod/gpt_network/generate-service/internal/config"
+	grpcConn "github.com/Crabocod/gpt_network/generate-service/internal/grpc"
+	pb "github.com/Crabocod/gpt_network/generate-service/internal/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,7 +25,7 @@ func (p *Post) Save() error {
 	defer grpcConn.Close()
 
 	saveClient := pb.NewApiServiceClient(grpcConn.Conn)
-	resp, err := saveClient.SavePost(context.Background(), &pb.SavePostRequest{Text: p.Text, AuthorName: "test"})
+	resp, err := saveClient.SavePost(context.Background(), &pb.SavePostRequest{Text: p.Text, AuthorName: p.AuthorName})
 	if err != nil || !resp.Success {
 		return err
 	}

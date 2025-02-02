@@ -1,16 +1,15 @@
-module generate
+module github.com/Crabocod/gpt_network/generate-service
 
 go 1.23.2
 
 require (
-	github.com/joho/godotenv v1.5.1
+	github.com/BurntSushi/toml v1.4.0
+	github.com/sirupsen/logrus v1.9.3
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.34.2
 )
 
 require (
-	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect

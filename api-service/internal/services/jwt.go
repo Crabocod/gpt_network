@@ -3,8 +3,8 @@ package services
 import (
 	"time"
 
+	"github.com/Crabocod/gpt_network/api-service/internal/config"
 	"github.com/golang-jwt/jwt/v5"
-	"web.app/internal/config"
 )
 
 var JWTSecret = []byte(config.Data.JWT.AccessSecret)

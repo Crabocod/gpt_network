@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"generate/internal/config"
+	"github.com/Crabocod/gpt_network/generate-service/internal/config"
 
 	"github.com/sirupsen/logrus"
 )

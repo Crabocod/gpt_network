@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"web.app/internal/models"
-	"web.app/internal/services"
+	"github.com/Crabocod/gpt_network/api-service/internal/models"
+	"github.com/Crabocod/gpt_network/api-service/internal/services"
 
 	"github.com/golang-jwt/jwt/v5"
 )

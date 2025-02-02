@@ -1,7 +1,7 @@
 package models
 
 import (
-	"web.app/internal/db"
+	"github.com/Crabocod/gpt_network/api-service/internal/db"
 )
 
 type Comment struct {

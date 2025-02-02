@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 
-	"generate/internal/config"
-	grpcConn "generate/internal/grpc"
-	pb "generate/internal/proto"
+	"github.com/Crabocod/gpt_network/generate-service/internal/config"
+	grpcConn "github.com/Crabocod/gpt_network/generate-service/internal/grpc"
+	pb "github.com/Crabocod/gpt_network/generate-service/internal/proto"
 )
 
 func GenerateText(question, modelName string) (string, error) {

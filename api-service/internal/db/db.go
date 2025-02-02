@@ -3,9 +3,9 @@ package db
 import (
 	"fmt"
 
+	"github.com/Crabocod/gpt_network/api-service/internal/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"web.app/internal/config"
 )
 
 var DB *sqlx.DB

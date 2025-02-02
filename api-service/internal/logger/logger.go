@@ -1,8 +1,8 @@
 package logger
 
 import (
+	"github.com/Crabocod/gpt_network/api-service/internal/config"
 	"github.com/sirupsen/logrus"
-	"web.app/internal/config"
 )
 
 var Logrus *logrus.Logger

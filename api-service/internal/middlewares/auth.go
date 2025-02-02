@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"web.app/internal/services"
+	"github.com/Crabocod/gpt_network/api-service/internal/services"
 
 	"github.com/golang-jwt/jwt/v5"
 )

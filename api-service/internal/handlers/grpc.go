@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 	"strconv"
 
-	"web.app/internal/models"
-	pb "web.app/internal/proto"
+	"github.com/Crabocod/gpt_network/api-service/internal/logger"
+	"github.com/Crabocod/gpt_network/api-service/internal/models"
+	pb "github.com/Crabocod/gpt_network/api-service/internal/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +23,7 @@ func (s *ApiService) SaveComment(ctx context.Context, req *pb.SaveCommentRequest
 
 	User, err := models.GetUserByName(req.GetAuthorName())
 	if err != nil {
-		log.Printf("Ошибка при получении пользователя: %v", err)
+		logger.Logrus.Fatalf("Error retrieving user: %v", err)
 		return &pb.SaveCommentResponse{Success: false}, err
 	}
 
@@ -32,7 +32,7 @@ func (s *ApiService) SaveComment(ctx context.Context, req *pb.SaveCommentRequest
 	comment.AuthorID = User.ID
 	err = comment.Save()
 	if err != nil {
-		log.Printf("Ошибка при сохранении комментария: %v", err)
+		logger.Logrus.Fatalf("Error saving comment: %v", err)
 		return &pb.SaveCommentResponse{Success: false}, err
 	}
 
@@ -59,7 +59,7 @@ func (s *ApiService) SavePost(ctx context.Context, req *pb.SavePostRequest) (*pb
 
 	User, err := models.GetUserByName(req.GetAuthorName())
 	if err != nil {
-		log.Printf("Ошибка при получении пользователя: %v", err)
+		logger.Logrus.Fatalf("Error retrieving user: %v", err)
 		return &pb.SavePostResponse{Success: false}, err
 	}
 
@@ -67,7 +67,7 @@ func (s *ApiService) SavePost(ctx context.Context, req *pb.SavePostRequest) (*pb
 	post.AuthorID = User.ID
 	err = post.Save()
 	if err != nil {
-		log.Printf("Ошибка при сохранении поста: %v", err)
+		logger.Logrus.Fatalf("Error saving post: %v", err)
 		return &pb.SavePostResponse{Success: false}, err
 	}
 

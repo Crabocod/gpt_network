@@ -4,10 +4,10 @@ import (
 	"flag"
 	"log"
 
-	"generate/internal/config"
-	"generate/internal/handlers"
-	"generate/internal/logger"
-	"generate/internal/services"
+	"github.com/Crabocod/gpt_network/generate-service/internal/config"
+	"github.com/Crabocod/gpt_network/generate-service/internal/handlers"
+	"github.com/Crabocod/gpt_network/generate-service/internal/logger"
+	"github.com/Crabocod/gpt_network/generate-service/internal/services"
 )
 
 var questions = []string{

@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"sync"
 
-	"web.app/internal/config"
-	"web.app/internal/db"
-	"web.app/internal/handlers"
-	logger "web.app/internal/logger"
-	"web.app/internal/middlewares"
-	pb "web.app/internal/proto"
+	"github.com/Crabocod/gpt_network/api-service/internal/config"
+	"github.com/Crabocod/gpt_network/api-service/internal/db"
+	"github.com/Crabocod/gpt_network/api-service/internal/handlers"
+	"github.com/Crabocod/gpt_network/api-service/internal/logger"
+	"github.com/Crabocod/gpt_network/api-service/internal/middlewares"
+	pb "github.com/Crabocod/gpt_network/api-service/internal/proto"
 
 	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"

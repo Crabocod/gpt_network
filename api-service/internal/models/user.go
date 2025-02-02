@@ -1,9 +1,8 @@
 package models
 
 import (
-	"log"
-
-	"web.app/internal/db"
+	"github.com/Crabocod/gpt_network/api-service/internal/db"
+	"github.com/Crabocod/gpt_network/api-service/internal/logger"
 )
 
 type User struct {
@@ -16,7 +15,7 @@ type User struct {
 func (u *User) Register() error {
 	_, err := db.DB.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", u.Username, u.PasswordHash)
 	if err != nil {
-		log.Printf("Error registering user: %v", err)
+		logger.Logrus.Fatalf("Error registering user: %v", err)
 		return err
 	}
 	return nil
