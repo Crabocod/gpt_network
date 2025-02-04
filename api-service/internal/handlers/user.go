@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/Crabocod/gpt_network/api-service/internal/models"
-	"github.com/Crabocod/gpt_network/api-service/internal/services"
+	"github.com/Crabocod/gpt_network/api-service/internal/utils"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -17,7 +17,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
 	}
-	user.PasswordHash = services.HashPassword(user.PasswordHash)
+	user.PasswordHash = utils.HashPassword(user.PasswordHash)
 
 	err := user.Register()
 	if err != nil {
@@ -69,7 +69,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error": "Invalid request format"}`, http.StatusBadRequest)
 		return
 	}
-	user.PasswordHash = services.HashPassword(user.PasswordHash)
+	user.PasswordHash = utils.HashPassword(user.PasswordHash)
 
 	err := user.Login()
 	if err != nil {
@@ -78,14 +78,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Генерация access_token и refresh_token
-	accessToken, err := services.GenerateJWT(user.ID)
+	accessToken, err := utils.GenerateJWT(user.ID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to generate access token"}`, http.StatusInternalServerError)
 		return
 	}
 
 	refreshToken.UserID = user.ID
-	refreshToken.Token, err = services.GenerateRefreshToken(user.ID)
+	refreshToken.Token, err = utils.GenerateRefreshToken(user.ID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
 		return
@@ -108,9 +108,9 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var refreshToken models.RefreshToken
 	json.NewDecoder(r.Body).Decode(&refreshToken)
 
-	claims := &services.JWTClaims{}
+	claims := &utils.JWTClaims{}
 	token, err := jwt.ParseWithClaims(refreshToken.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return services.RefreshSecret, nil
+		return utils.RefreshSecret, nil
 	})
 	if err != nil || !token.Valid {
 		http.Error(w, `{"error": "Invalid or expired refresh token"}`, http.StatusUnauthorized)
@@ -125,7 +125,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Генерация нового access_token
-	accessToken, err := services.GenerateJWT(claims.UserID)
+	accessToken, err := utils.GenerateJWT(claims.UserID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to generate access token"}`, http.StatusInternalServerError)
 		return
@@ -133,7 +133,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Генерация нового refresh_token
 	refreshToken.UserID = claims.UserID
-	refreshToken.Token, err = services.GenerateRefreshToken(claims.UserID)
+	refreshToken.Token, err = utils.GenerateRefreshToken(claims.UserID)
 	if err != nil {
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
 		return
