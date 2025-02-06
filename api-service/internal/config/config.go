@@ -1,31 +1,29 @@
 package config
 
-import "github.com/BurntSushi/toml"
-
 type Config struct {
 	Database struct {
-		Host     string `toml:"DB_HOST"`
-		Port     string `toml:"DB_PORT"`
-		User     string `toml:"DB_USER"`
-		Password string `toml:"DB_PASSWORD"`
-		Name     string `toml:"DB_NAME"`
-		SSLMode  string `toml:"DB_SSLMODE"`
+		Host     string `toml:"db_host"`
+		Port     string `toml:"db_port"`
+		User     string `toml:"db_user"`
+		Password string `toml:"db_password"`
+		Name     string `toml:"db_name"`
+		SSLMode  string `toml:"db_sslmode"`
 	}
 	JWT struct {
-		AccessSecret  string `toml:"JWT_ACCESS_SECRET"`
-		RefreshSecret string `toml:"JWT_REFRESH_SECRET"`
+		AccessSecret  string `toml:"jwt_access_secret"`
+		RefreshSecret string `toml:"jwt_refresh_secret"`
 	}
 	Logger struct {
-		LogLevel string `toml:"LOG_LEVEL"`
+		LogLevel string `toml:"log_level"`
+	}
+	ApiServer struct {
+		BindAddr string `toml:"bind_addr"`
+	}
+	GrpcServer struct {
+		BindAddr string `toml:"bind_addr"`
 	}
 }
 
-var Data Config
-
-func LoadConfig(path string) error {
-	_, err := toml.DecodeFile(path, &Data)
-	if err != nil {
-		return err
-	}
-	return nil
+func NewConfig() *Config {
+	return &Config{}
 }

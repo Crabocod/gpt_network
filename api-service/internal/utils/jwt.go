@@ -3,12 +3,11 @@ package utils
 import (
 	"time"
 
-	"github.com/Crabocod/gpt_network/api-service/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var JWTSecret = []byte(config.Data.JWT.AccessSecret)
-var RefreshSecret = []byte(config.Data.JWT.RefreshSecret)
+var JWTSecret = "71wdyirsaywkwznuzo75b055wyddnu"
+var RefreshSecret = "71wdyirsaywkwznuzo75b055wyddnu"
 
 type JWTClaims struct {
 	UserID int `json:"user_id"`

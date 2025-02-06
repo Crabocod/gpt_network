@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"github.com/Crabocod/gpt_network/api-service/internal/db"
 	"github.com/Crabocod/gpt_network/api-service/internal/models"
 )
 
@@ -24,7 +23,7 @@ func (r *PostRepository) GetList(offset, recordsPerPage int) ([]models.Post, err
 		ORDER BY 
 			p.created_at DESC 
 		LIMIT $1 OFFSET $2`
-	err := db.DB.Select(&posts, query, recordsPerPage, offset)
+	err := r.store.db.Select(&posts, query, recordsPerPage, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func (r *PostRepository) GetList(offset, recordsPerPage int) ([]models.Post, err
 
 func (r *PostRepository) GetCount() (int, error) {
 	var count int
-	err := db.DB.QueryRow("SELECT COUNT(*) FROM posts").Scan(&count)
+	err := r.store.db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -43,13 +42,13 @@ func (r *PostRepository) GetCount() (int, error) {
 func (r *PostRepository) Save(p models.Post) error {
 	if p.ID > 0 {
 		query := `UPDATE posts SET text = $1 WHERE id = $2`
-		_, err := db.DB.Exec(query, p.Text, p.ID)
+		_, err := r.store.db.Exec(query, p.Text, p.ID)
 		if err != nil {
 			return err
 		}
 	} else {
 		query := `INSERT INTO posts (author_id, text) VALUES ($1, $2) RETURNING id`
-		err := db.DB.QueryRow(query, p.AuthorID, p.Text).Scan(&p.ID)
+		err := r.store.db.QueryRow(query, p.AuthorID, p.Text).Scan(&p.ID)
 		if err != nil {
 			return err
 		}
@@ -58,7 +57,7 @@ func (r *PostRepository) Save(p models.Post) error {
 }
 
 func (r *PostRepository) Delete(p models.Post) error {
-	_, err := db.DB.Exec("DELETE FROM posts WHERE id = $1", p.ID)
+	_, err := r.store.db.Exec("DELETE FROM posts WHERE id = $1", p.ID)
 	if err != nil {
 		return err
 	}
@@ -88,7 +87,7 @@ func (r *PostRepository) GetLatestFilteredPost(excludedAuthorName string) (*mode
 		ORDER BY 
 			created_at DESC
 		LIMIT 1`
-	err := db.DB.Get(&post, query, excludedAuthorName)
+	err := r.store.db.Get(&post, query, excludedAuthorName)
 	if err != nil {
 		return nil, err
 	}
