@@ -4,10 +4,16 @@ FROM golang:1.23.2-alpine AS builder
 WORKDIR /go/src/app
 
 # Копируем все файлы в контейнер
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
+# Генерируем код wire
+RUN go generate ./...
+
 # Загружаем зависимости и собираем приложение
-RUN go mod download && go build -o app cmd/main.go
+RUN go build -o app cmd/main.go
 
 # Используем минимальный образ для запуска
 FROM alpine:latest

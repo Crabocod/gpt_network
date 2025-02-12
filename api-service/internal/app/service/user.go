@@ -13,6 +13,7 @@ type UserServiceInterface interface {
 	Get(username, passwordHash string) (*models.User, error)
 	GetIDByToken(refreshToken string) (int, error)
 	GetByID(id int) (*models.User, error)
+	GetByName(name string) (*models.User, error)
 }
 
 type UserService struct {
@@ -47,6 +48,15 @@ func (s *UserService) Get(username, password string) (*models.User, error) {
 
 func (s *UserService) GetByID(id int) (*models.User, error) {
 	user, err := s.store.User().GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (s *UserService) GetByName(name string) (*models.User, error) {
+	user, err := s.store.User().GetUserByName(name)
 	if err != nil {
 		return nil, err
 	}

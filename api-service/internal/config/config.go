@@ -1,29 +1,57 @@
 package config
 
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
+
 type Config struct {
-	Database struct {
-		Host     string `toml:"db_host"`
-		Port     string `toml:"db_port"`
-		User     string `toml:"db_user"`
-		Password string `toml:"db_password"`
-		Name     string `toml:"db_name"`
-		SSLMode  string `toml:"db_sslmode"`
-	}
-	JWT struct {
-		AccessSecret  string `toml:"jwt_access_secret"`
-		RefreshSecret string `toml:"jwt_refresh_secret"`
-	}
-	Logger struct {
-		LogLevel string `toml:"log_level"`
-	}
-	ApiServer struct {
-		BindAddr string `toml:"bind_addr"`
-	}
-	GrpcServer struct {
-		BindAddr string `toml:"bind_addr"`
-	}
+	Database   DatabaseConfig
+	JWT        JWTConfig
+	Logger     LoggerConfig
+	ApiServer  ApiServerConfig
+	GrpcServer GrpcServerConfig
 }
 
-func NewConfig() *Config {
-	return &Config{}
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+	SSLMode  string
+}
+
+type JWTConfig struct {
+	AccessSecret  string
+	RefreshSecret string
+}
+
+type LoggerConfig struct {
+	LogLevel string
+}
+
+type ApiServerConfig struct {
+	BindAddr string
+}
+
+type GrpcServerConfig struct {
+	BindAddr string
+}
+
+func Load() (*Config, error) {
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath("./configs")
+
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, err
+	}
+	fmt.Println(config)
+	return &config, nil
 }

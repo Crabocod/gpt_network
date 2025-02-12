@@ -1,6 +1,8 @@
 package apiserver
 
 import (
+	"context"
+	"errors"
 	"github.com/Crabocod/gpt_network/api-service/internal/app/controller/rest"
 	"github.com/Crabocod/gpt_network/api-service/internal/app/service"
 	"github.com/Crabocod/gpt_network/api-service/internal/app/store/postgresql"
@@ -12,6 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
+	"time"
 )
 
 type APIServer struct {
@@ -19,30 +22,54 @@ type APIServer struct {
 	config *config.Config
 	router *mux.Router
 	db     *sqlx.DB
+	server *http.Server
 }
 
 func New(db *sqlx.DB, config *config.Config) *APIServer {
-	return &APIServer{
+	s := &APIServer{
 		logger: logrus.New(),
 		router: mux.NewRouter(),
 		config: config,
 		db:     db,
 	}
-}
 
-func (s *APIServer) Run() error {
 	if err := s.configureLogger(); err != nil {
-		return err
+		s.logger.Fatal(err)
 	}
 
 	s.configureRouter()
 
-	s.logger.Info("HTTP server started on port ", s.config.ApiServer.BindAddr)
-	if err := http.ListenAndServe(s.config.ApiServer.BindAddr, getCORS(s.router)); err != nil {
+	s.server = &http.Server{
+		Addr:    s.config.ApiServer.BindAddr,
+		Handler: getCORS(s.router),
+	}
+
+	return s
+}
+
+func (s *APIServer) Run(ctx context.Context) error {
+	s.logger.Info("Starting HTTP server on ", s.config.ApiServer.BindAddr)
+
+	go func() {
+		<-ctx.Done()
+		s.logger.Info("Shutting down HTTP server...")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		if err := s.server.Shutdown(shutdownCtx); err != nil {
+			s.logger.Error("HTTP server shutdown error: ", err)
+		}
+	}()
+
+	if err := s.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 
 	return nil
+}
+
+func (s *APIServer) Shutdown(ctx context.Context) error {
+	return s.server.Shutdown(ctx)
 }
 
 func (s *APIServer) configureRouter() {
@@ -67,7 +94,6 @@ func (s *APIServer) configureRouter() {
 	s.router.Handle("/comments/{id}/", middlewares.AuthMiddleware(http.HandlerFunc(controller.CommentController.DeleteCommentHandler))).Methods("DELETE")
 
 	s.router.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", http.FileServer(http.Dir("./docs"))))
-
 	s.router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/docs/swagger.yaml"),
 	))

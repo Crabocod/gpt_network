@@ -10,6 +10,7 @@ type PostServiceInterface interface {
 	GetList(r GetPostsRequest) ([]models.Post, error)
 	Save(post models.Post) error
 	Delete(post models.Post) error
+	GetLatestFilteredPost(authorName string) (*models.Post, error)
 }
 
 type GetPostsRequest struct {
@@ -47,6 +48,15 @@ func (s *PostService) GetCount() (int, error) {
 	}
 
 	return count, nil
+}
+
+func (s *PostService) GetLatestFilteredPost(authorName string) (*models.Post, error) {
+	post, err := s.store.Post().GetLatestFilteredPost(authorName)
+	if err != nil {
+		return nil, err
+	}
+
+	return post, nil
 }
 
 func (s *PostService) GetList(r GetPostsRequest) ([]models.Post, error) {

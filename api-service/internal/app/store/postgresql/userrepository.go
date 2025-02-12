@@ -34,3 +34,12 @@ func (r *UserRepository) GetByID(id int) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) GetUserByName(name string) (*models.User, error) {
+	var user models.User
+	err := r.store.db.Get(&user, "SELECT * FROM users WHERE username=$1", name)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

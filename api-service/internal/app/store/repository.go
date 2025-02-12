@@ -6,6 +6,7 @@ type UserRepository interface {
 	Save(user models.User) error
 	Get(username, passwordHash string) (*models.User, error)
 	GetByID(id int) (*models.User, error)
+	GetUserByName(name string) (*models.User, error)
 }
 
 type TokenRepository interface {
